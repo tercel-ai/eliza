@@ -21,11 +21,13 @@ import {
     stringToUuid,
     settings,
     type IAgentRuntime,
+    type TypeDatabaseAdapter,
 } from "@elizaos/core";
 import { createApiRouter } from "./api.ts";
 import * as fs from "fs";
 import * as path from "path";
 import { createVerifiableLogApiRouter } from "./verifiable-log-api.ts";
+import { createManageApiRouter } from "./manage-api.ts";
 import OpenAI from "openai";
 
 const storage = multer.diskStorage({
@@ -115,6 +117,7 @@ export class DirectClient {
     public startAgent: Function; // Store startAgent functor
     public loadCharacterTryPath: Function; // Store loadCharacterTryPath functor
     public jsonToCharacter: Function; // Store jsonToCharacter functor
+    public db: TypeDatabaseAdapter;
 
     constructor() {
         elizaLogger.log("DirectClient constructor");
@@ -140,6 +143,9 @@ export class DirectClient {
 
         const apiLogRouter = createVerifiableLogApiRouter(this.agents);
         this.app.use(apiLogRouter);
+
+        const manageApiRouter = createManageApiRouter(this.agents, this);
+        this.app.use(manageApiRouter);
 
         // Define an interface that extends the Express Request interface
         interface CustomRequest extends ExpressRequest {
