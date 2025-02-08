@@ -145,7 +145,7 @@ export class DirectClient {
         this.app.use(apiLogRouter);
 
         const manageApiRouter = createManageApiRouter(this.agents, this);
-        this.app.use(manageApiRouter);
+        this.app.use('/manage', manageApiRouter);
 
         // Define an interface that extends the Express Request interface
         interface CustomRequest extends ExpressRequest {
