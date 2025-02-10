@@ -25,22 +25,26 @@
         "@elizaos/plugin-tee-verifiable-log": "workspace:*",
         "@types/body-parser": "1.19.5",
         "@types/cors": "2.8.17",
-        "@types/express": "5.0.0",
+        "@types/express": "^4.17.21",
         "body-parser": "1.20.3",
         "cors": "2.8.5",
         "discord.js": "14.16.3",
         "express": "4.21.1",
         "jsonwebtoken": "^9.0.2",
         "multer": "1.4.5-lts.1",
-        "openai": "4.73.0"
+        "openai": "4.73.0",
+        "swagger-autogen": "^2.23.7",
+        "swagger-ui-express": "^5.0.1",
+        "url": "^0.11.4"
     },
     "devDependencies": {
         "@types/multer": "^1.4.12",
         "tsup": "8.3.5"
     },
     "scripts": {
-        "build": "tsup --format esm --dts",
-        "dev": "tsup --format esm --dts --watch"
+        "build": "tsup --format esm --dts && ts-node ./swagger.mjs",
+        "dev": "tsup --format esm --dts --watch",
+        "swagger-autogen": "ts-node ./swagger.mjs"
     },
     "peerDependencies": {
         "whatwg-url": "7.1.0"

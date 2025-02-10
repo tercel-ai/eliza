@@ -17,12 +17,11 @@ import type { TeeLogQuery, TeeLogService } from "@elizaos/plugin-tee-log";
 import { REST, Routes } from "discord.js";
 import type { DirectClient } from ".";
 import { validateUUIDParams } from ".";
-import { md5, signToken } from "./auth";
 
 export function createApiRouter(
     agents: Map<string, AgentRuntime>,
     directClient: DirectClient
-) {
+): express.Router {
     const router = express.Router();
 
     router.use(cors());
@@ -268,17 +267,6 @@ export function createApiRouter(
             }
         }
     );
-
-    router.post("/auth/login", async (req, res) => {
-        const { username, password } = req.body;
-        const valid = username === settings.JWT_USERNAME && password === md5(settings.JWT_PASSWORD);
-        if (valid) {
-            const token = signToken({ username });
-            res.json({ success: true, token: token });
-        } else {
-            res.status(401).json({ error: "Invalid username or password" });
-        }
-    });
 
     return router;
 }

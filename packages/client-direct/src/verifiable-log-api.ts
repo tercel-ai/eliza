@@ -10,7 +10,7 @@ import type {
 
 export function createVerifiableLogApiRouter(
     agents: Map<string, AgentRuntime>
-) {
+): express.Router {
     const router = express.Router();
     router.use(cors());
     router.use(bodyParser.json());

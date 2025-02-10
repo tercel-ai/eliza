@@ -14,16 +14,51 @@ import {
     type Character,
     type PaginationParams,
     AccountStatus,
-    stringToUuid
+    stringToUuid,
+    settings,
 } from "@elizaos/core";
 
 import type { DirectClient } from ".";
 import { validateUUIDParams } from ".";
+import { md5, signToken, verifyToken } from "./auth";
+
+
+async function verifyTokenMiddleware(req: any, res: any, next) {
+    console.log("verifyTokenMiddleware", req.url);
+    // if JWT is not enabled, skip verification
+    if (!(settings.JWT_ENABLED && settings.JWT_ENABLED.toLowerCase() === 'true')) {
+        next();
+        return;
+    }
+
+    const url: string = req.url.split('?')[0];
+    if (url.indexOf('/login') === 0) {
+        next();
+    } else {
+        try {
+            const { authorization } = req.headers;
+            if (!authorization) throw new Error('no token');
+            const token = authorization.startsWith('Bearer ') 
+            ? authorization.split(' ')[1] 
+            : authorization;
+            const verified = await verifyToken(token);
+            if (verified) {
+                next();
+            } else {
+                throw new Error('fail to verify token');
+            }
+        } catch (err: any) {
+            res.status(401).json({ error: err.message });
+            return;
+        }
+    }
+};
+
 
 export function createManageApiRouter(
     agents: Map<string, AgentRuntime>,
     directClient: DirectClient
-) {
+): express.Router {
     const router = express.Router();
 
     router.use(cors());
@@ -35,6 +70,8 @@ export function createManageApiRouter(
         })
     );
 
+    router.use(verifyTokenMiddleware);
+
     const changeAccountStatus = async (accountId: UUID, status: AccountStatus) => {
         const account = await directClient.db.getAccountById(accountId);
         if(account) {
@@ -42,6 +79,17 @@ export function createManageApiRouter(
             await directClient.db.updateAccount(account);
         }
     }
+
+    router.post("/login", async (req, res) => {
+        const { username, password } = req.body;
+        const valid = username === settings.JWT_USERNAME && password === md5(settings.JWT_PASSWORD);
+        if (valid) {
+            const token = signToken({ username });
+            res.json({ success: true, token: token });
+        } else {
+            res.status(401).json({ error: "Invalid username or password" });
+        }
+    });
 
     router.get("/accounts", async (req, res) => {
         const params: PaginationParams = {
@@ -58,6 +106,12 @@ export function createManageApiRouter(
             });
         }
         res.json(result);
+    });
+
+    router.get("/account/:accountId", async (req, res) => {
+        const accountId = req.params.accountId as UUID;
+        const account = await directClient.db.getAccountById(accountId);
+        res.json(account);
     });
 
     router.post("/account/update", async (req, res) => {

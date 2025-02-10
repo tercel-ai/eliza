@@ -30,8 +30,12 @@ import * as fs from "fs";
 import * as path from "path";
 import { createVerifiableLogApiRouter } from "./verifiable-log-api.ts";
 import { createManageApiRouter } from "./manage-api.ts";
-import { verifyToken } from "./auth.ts";
 import OpenAI from "openai";
+import swaggerUi from 'swagger-ui-express';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -113,33 +117,6 @@ Response format should be formatted in a JSON block like this:
 \`\`\`
 `;
 
-async function verifyTokenMiddleware(req: any, res: any, next) {
-    // if JWT is not enabled, skip verification
-    if (!(settings.JWT_ENABLED && settings.JWT_ENABLED.toLowerCase() === 'true')) {
-        next();
-        return;
-    }
-
-    const url: string = req.url.split('?')[0];
-    if (url.indexOf('/manage/') !== 0) {
-    next();
-    } else {
-        try {
-            const { authorization } = req.headers;
-            if (!authorization) throw new Error('no token');
-            const token = await verifyToken(authorization.split(' ')[1]);
-            if (token) {
-                next();
-            } else {
-                throw new Error('fail to verify token');
-            }
-        } catch (err: any) {
-            res.status(401).json({ error: err.message });
-            return;
-        }
-    }
-};
-
 interface UUIDParams {
     agentId: UUID;
     roomId?: UUID;
@@ -171,6 +148,7 @@ export function validateUUIDParams(
     return { agentId };
 }
 
+
 export class DirectClient {
     public app: express.Application;
     private agents: Map<string, AgentRuntime>; // container management
@@ -189,9 +167,21 @@ export class DirectClient {
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
 
-        this.app.use(verifyTokenMiddleware);
-
-
+        try {
+            const swaggerManageApiPath = path.join(__dirname, '../swagger-manage-api.json');
+            elizaLogger.log('Swagger manage api path:', swaggerManageApiPath);
+            if(fs.existsSync(swaggerManageApiPath)) {
+                const swaggerDocument = JSON.parse(fs.readFileSync(swaggerManageApiPath, 'utf8'));
+                elizaLogger.log('Swagger documentation loaded');
+                this.app.use('/docs-manage', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+            } else {
+                elizaLogger.error('Swagger manage api documentation not found:', swaggerManageApiPath);
+            }
+        } catch (error) {
+            elizaLogger.error('Error generating Swagger documentation:', error.message);
+            console.error('Error generating Swagger documentation:', error);
+        }
+        
         this.app.get("/", (req, res) => {
             res.send("Welcome, this is the REST API!");
         });
