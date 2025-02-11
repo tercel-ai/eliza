@@ -262,12 +262,16 @@ export function createManageApiRouter(
     });
 
     router.post("/agent/start", async (req, res) => {
-        const { characterPath, characterJson } = req.body;
-        console.log("characterPath:", characterPath);
-        console.log("characterJson:", characterJson);
+        const { accountId, characterPath, characterJson } = req.body;
         try {
             let character: Character;
-            if (characterJson) {
+            if(accountId) {
+                const account = await directClient.db.getAccountById(accountId);
+                if(account) {
+                    character = account.details as Character;
+                    character.id = accountId;
+                }
+            } else if (characterJson) {
                 character = await directClient.jsonToCharacter(
                     characterPath,
                     characterJson
@@ -279,6 +283,7 @@ export function createManageApiRouter(
                 throw new Error("No character path or JSON provided");
             }
             await directClient.startAgent(character);
+            await changeAccountStatus(character.id, AccountStatus.ACTIVE);
             elizaLogger.log(`${character.name} started`);
 
             res.json({

@@ -262,7 +262,7 @@ export class AgentRuntime implements IAgentRuntime {
         this.agentId =
             opts.character?.id ??
             opts?.agentId ??
-            stringToUuid(opts.character?.name ?? uuidv4());
+            stringToUuid(opts.character?.username ?? opts.character?.name ?? uuidv4());
         this.character = opts.character || defaultCharacter;
 
         elizaLogger.info(`${this.character.name}(${this.agentId}) - Initializing AgentRuntime with options:`, {

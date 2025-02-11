@@ -158,7 +158,7 @@ import { ankrPlugin } from "@elizaos/plugin-ankr";
 import { formPlugin } from "@elizaos/plugin-form";
 import { MongoClient } from "mongodb";
 import { quickIntelPlugin } from "@elizaos/plugin-quick-intel";
-
+import { v4 as uuidv4 } from "uuid";
 import { trikonPlugin } from "@elizaos/plugin-trikon";
 import arbitragePlugin from "@elizaos/plugin-arbitrage";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
@@ -1394,9 +1394,9 @@ async function startAgent(
     db: TypeDatabaseAdapter
 ): Promise<AgentRuntime> {
     try {
-        character.id ??= stringToUuid(character.name);
         character.username ??= character.name;
-
+        character.id ??= stringToUuid(character.username || uuidv4());
+        
         const token = getTokenForProvider(character.modelProvider, character);
 
         const cache = initializeCache(
