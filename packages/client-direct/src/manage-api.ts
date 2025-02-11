@@ -117,7 +117,7 @@ export function createManageApiRouter(
     });
 
     router.post("/account/update", async (req, res) => {
-        const character: any = {...req.body};
+        const character = req.body;
         try {
             const userId = character.id || stringToUuid(character.username || character.name || uuidv4());
             let account = await directClient.db.getAccountById(userId);
