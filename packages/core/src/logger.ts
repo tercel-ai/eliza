@@ -41,17 +41,33 @@ const options = {
         ): void {
             const [arg1, ...rest] = inputArgs;
 
+            const formatError = (err: Error) => ({
+                message: err.message,
+                stack: err.stack?.split('\n').map(line => line.trim()),
+                name: err.name,
+                ...err
+            });
+
             if (typeof arg1 === "object") {
-                const messageParts = rest.map((arg) =>
-                    typeof arg === "string" ? arg : JSON.stringify(arg)
-                );
-                const message = messageParts.join(" ");
-                method.apply(this, [arg1, message]);
+                if (arg1 instanceof Error) {
+                    method.apply(this, [{
+                        error: formatError(arg1)
+                    }]);
+                } else {
+                    const messageParts = rest.map((arg) =>
+                        typeof arg === "string" ? arg : JSON.stringify(arg)
+                    );
+                    const message = messageParts.join(" ");
+                    method.apply(this, [arg1, message]);
+                }
             } else {
                 const context = {};
-                const messageParts = [arg1, ...rest].map((arg) =>
-                    typeof arg === "string" ? arg : arg
-                );
+                const messageParts = [arg1, ...rest].map((arg) => {
+                    if (arg instanceof Error) {
+                        return formatError(arg);
+                    }
+                    return typeof arg === "string" ? arg : arg;
+                });
                 const message = messageParts
                     .filter((part) => typeof part === "string")
                     .join(" ");
