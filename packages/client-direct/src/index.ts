@@ -1043,6 +1043,15 @@ export class DirectClient {
                 });
             }
         });
+
+        // Error handling middleware should be the last middleware to be registered
+        this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            elizaLogger.error('Express error:', err);
+            res.status(500).json({
+                error: err.message || 'Internal Server Error',
+                stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+            });
+        });
     }
 
     // agent/src/index.ts:startAgent calls this

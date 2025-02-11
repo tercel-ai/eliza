@@ -87,27 +87,34 @@ export function createManageApiRouter(
             const token = signToken({ username });
             res.json({ success: true, token: token });
         } else {
-            res.status(401).json({ error: "Invalid username or password" });
+            res.status(400).json({ error: "Invalid username or password" });
         }
     });
 
-    router.get("/accounts", async (req, res) => {
-        const params: PaginationParams = {
-            page: req.query.page ? Number(req.query.page) : 1,
-            pageSize: req.query.pageSize ? Number(req.query.pageSize) : 10,
-            where: req.query.where ? JSON.parse(req.query.where as string) : {},
-            order: req.query.order ? JSON.parse(req.query.order as string) : {createdAt: 'DESC'},
-        }
-        const result = await directClient.db.paginate('accounts', params);
-        if(result.total) {
-            result.list = result.list.map((item: any) => {
-                if (typeof item.details === "string") {
-                    item.details = item.details ? JSON.parse(item.details) : {};
-                }
-                return item;
+    router.get("/accounts", async (req, res, next) => {
+        try {
+            const params: PaginationParams = {
+                page: req.query.page ? Number(req.query.page) : 1,
+                pageSize: req.query.pageSize ? Number(req.query.pageSize) : 10,
+                where: req.query.where ? JSON.parse(req.query.where as string) : {},
+                order: req.query.order ? JSON.parse(req.query.order as string) : {createdAt: 'DESC'},
+            }
+            const result = await directClient.db.paginate('accounts', params);
+            if(result.total) {
+                result.list = result.list.map((item: any) => {
+                    if (typeof item.details === "string") {
+                        item.details = item.details ? JSON.parse(item.details) : {};
+                    }
+                    return item;
+                });
+            }
+            res.json(result);
+        } catch (err) {
+            elizaLogger.error('Error in accounts', err);
+            res.status(400).json({
+                error: err.message,
             });
         }
-        res.json(result);
     });
 
     router.get("/account/:accountId", async (req, res) => {
