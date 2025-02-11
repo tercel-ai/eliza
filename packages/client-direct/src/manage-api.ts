@@ -146,7 +146,7 @@ export function createManageApiRouter(
                     data: account,
                 });
             } else {
-                const userId = character.id ||stringToUuid(character.username || character.name || uuidv4());
+                const userId = stringToUuid(character.username || character.name || uuidv4());
                 let account = await directClient.db.getAccountById(userId);
                 if(account) {
                     throw new Error('Account already exists');
