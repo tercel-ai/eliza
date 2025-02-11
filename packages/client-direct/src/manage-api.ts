@@ -126,9 +126,12 @@ export function createManageApiRouter(
     router.post("/account/update", async (req, res) => {
         const character = req.body;
         try {
-            const userId = character.id || stringToUuid(character.username || character.name || uuidv4());
-            let account = await directClient.db.getAccountById(userId);
-            if(account) {
+            
+            if(character.id) {
+                const account = await directClient.db.getAccountById(character.id);
+                if(!account) {
+                    throw new Error('Account not found');
+                }
                 delete character.id;
                 Object.assign(account.details, character);
                 if('name' in character) account.name = character.name;
@@ -143,6 +146,11 @@ export function createManageApiRouter(
                     data: account,
                 });
             } else {
+                const userId = character.id ||stringToUuid(character.username || character.name || uuidv4());
+                let account = await directClient.db.getAccountById(userId);
+                if(account) {
+                    throw new Error('Account already exists');
+                }
                 account = {
                     id: userId,
                     name: character.name,
