@@ -1,7 +1,16 @@
 import swaggerAutogen from 'swagger-autogen';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { dirname } from 'path';
 
-dotenv.config();
+// Get the directory path of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env file from project root
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 
 const port = process.env.SERVER_PORT ?? 3000;
 const srvUrl = process.env.SERVER_URL ?? 'http://localhost:' + port;
