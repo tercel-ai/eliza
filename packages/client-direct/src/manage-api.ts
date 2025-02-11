@@ -149,11 +149,11 @@ export function createManageApiRouter(
                 const userId = stringToUuid(character.username || character.name || uuidv4());
                 let account = await directClient.db.getAccountById(userId);
                 if(account) {
-                    throw new Error('Account already exists');
+                    throw new Error(`Account already exists, username is not unique: ${character.username}`);
                 }
                 account = {
                     id: userId,
-                    name: character.name,
+                    name: character.name || character.username,
                     username: character.username || character.name,
                     email: character.email || userId,
                     avatarUrl: character.avatarUrl || "",

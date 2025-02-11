@@ -213,8 +213,14 @@ function mergeCharacters(base: Character, child: Character): Character {
             ...Object.keys(baseObj || {}),
             ...Object.keys(childObj || {}),
         ]);
+        
+        // biome-ignore lint/complexity/noForEach: <explanation>
         keys.forEach((key) => {
-            if (
+            // Special handling for plugins array
+            if (key === 'plugins') {
+                // Always use child's plugins if defined (even if empty array)
+                result[key] = childObj[key] !== undefined ? childObj[key] : baseObj[key];
+            } else if (
                 typeof baseObj[key] === "object" &&
                 typeof childObj[key] === "object" &&
                 !Array.isArray(baseObj[key]) &&
@@ -225,6 +231,7 @@ function mergeCharacters(base: Character, child: Character): Character {
                 Array.isArray(baseObj[key]) ||
                 Array.isArray(childObj[key])
             ) {
+                // For other arrays, concatenate as before
                 result[key] = [
                     ...(baseObj[key] || []),
                     ...(childObj[key] || []),
@@ -244,7 +251,6 @@ function isAllStrings(arr: unknown[]): boolean {
 export async function loadCharacterFromOnchain(): Promise<Character[]> {
     const jsonText = onchainJson;
 
-    console.log("JSON:", jsonText);
     if (!jsonText) return [];
     const loadedCharacters = [];
     try {
@@ -490,34 +496,43 @@ export async function loadCharacters(
     return loadedCharacters;
 }
 
-async function handlePluginImporting(plugins: string[]) {
-    if (plugins.length > 0) {
-        elizaLogger.info("Plugins are: ", plugins);
-        const importedPlugins = await Promise.all(
-            plugins.map(async (plugin) => {
-                try {
-                    const importedPlugin = await import(plugin);
-                    const functionName =
-                        plugin
-                            .replace("@elizaos/plugin-", "")
-                            .replace(/-./g, (x) => x[1].toUpperCase()) +
-                        "Plugin"; // Assumes plugin function is camelCased with Plugin suffix
-                    return (
-                        importedPlugin.default || importedPlugin[functionName]
-                    );
-                } catch (importError) {
-                    elizaLogger.error(
-                        `Failed to import plugin: ${plugin}`,
-                        importError
-                    );
-                    return []; // Return null for failed imports
-                }
-            })
-        );
-        return importedPlugins;
-    } else {
+async function handlePluginImporting(plugins: string[] | any[]) {
+    if (!Array.isArray(plugins) || plugins.length === 0) {
         return [];
     }
+
+    elizaLogger.info("Plugins are: ", plugins);
+    const importedPlugins = await Promise.all(
+        plugins.map(async (plugin) => {
+            // if plugin is already an object, return it
+            if (typeof plugin === 'object' && plugin !== null) {
+                return plugin;
+            }
+
+            // ensure plugin is a string
+            if (typeof plugin !== 'string') {
+                elizaLogger.error(`Invalid plugin format: ${plugin}`);
+                return null;
+            }
+
+            try {
+                const importedPlugin = await import(plugin);
+                const functionName =
+                    plugin
+                        .replace("@elizaos/plugin-", "")
+                        .replace(/-./g, (x) => x[1].toUpperCase()) +
+                    "Plugin";
+                return importedPlugin.default || importedPlugin[functionName];
+            } catch (importError) {
+                elizaLogger.error(
+                    `Failed to import plugin: ${plugin}`,
+                    importError
+                );
+                return null;
+            }
+        })
+    );
+    return importedPlugins.filter(Boolean);
 }
 
 export function getTokenForProvider(
