@@ -44,7 +44,9 @@ CREATE TABLE IF NOT EXISTS accounts (
     "email" TEXT NOT NULL,
     "avatarUrl" TEXT,
     "details" JSONB DEFAULT '{}'::jsonb,
-    "status" TEXT
+    "status" TEXT,
+    "pid" TEXT,
+    "source" TEXT
 );
 
 CREATE TABLE IF NOT EXISTS rooms (

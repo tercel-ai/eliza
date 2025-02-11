@@ -973,33 +973,18 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
             order = { createdAt: 'desc' }
         } = params;
 
-        // Start building the query
-        let query = this.supabase.from(table).select('*', { count: 'exact' });
+        // Start building the query with count
+        let query = this.supabase
+            .from(table)
+            .select('*', { count: 'exact' });
 
-        // Add where conditions
-        // biome-ignore lint/complexity/noForEach: <explanation>
-        Object.entries(where).forEach(([key, value]) => {
-            if (value === null || value === undefined) return;
+        // Apply where conditions
+        query = this.applyWhereConditions(query, where);
 
-            if (typeof value === 'object') {
-                if (key === 'createdAt') {
-                    query = query.gte(key, value.gte);
-                }
-                if (value.lte) {
-                    query = query.lte(key, value.lte);
-                }
-            } else {
-                query = query.eq(key, value);
-            }
-        });
+        // Apply ordering
+        query = this.applyOrderConditions(query, order);
 
-        // Add ordering
-        // biome-ignore lint/complexity/noForEach: <explanation>
-        Object.entries(order).forEach(([key, direction]) => {
-            query = query.order(key, { ascending: direction.toLowerCase() === 'asc' });
-        });
-
-        // Add pagination
+        // Apply pagination
         const from = (page - 1) * pageSize;
         const to = from + pageSize - 1;
         query = query.range(from, to);
@@ -1018,5 +1003,45 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
             pageSize,
             totalPages: count ? Math.ceil(count / pageSize) : 0,
         };
+    }
+
+    private applyWhereConditions(query: any, where: Record<string, any>): any {
+        // Handle where conditions
+        // biome-ignore lint/complexity/noForEach: <explanation>
+        Object.entries(where).forEach(([key, value]) => {
+            if (value === undefined) return;
+
+            if (typeof value === 'object') {
+                if ('ne' in value) {
+                    query = query.neq(key, value.ne);
+                }
+                if ('eq' in value) {
+                    query = query.eq(key, value.eq);
+                }
+                if ('gt' in value) {
+                    query = query.gt(key, value.gt);
+                }
+                if ('gte' in value) {
+                    query = query.gte(key, value.gte);
+                }
+                if ('lt' in value) {
+                    query = query.lt(key, value.lt);
+                }
+                if ('lte' in value) {
+                    query = query.lte(key, value.lte);
+                }
+            } else {
+                query = query.eq(key, value);
+            }
+        });
+
+        return query;
+    }
+
+    private applyOrderConditions(query: any, order: Record<string, string>): any {
+        Object.entries(order).forEach(([key, direction]) => {
+            query = query.order(key, { ascending: direction.toLowerCase() === 'asc' });
+        });
+        return query;
     }
 }

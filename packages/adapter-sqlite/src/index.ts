@@ -7,6 +7,8 @@ import {
     type IDatabaseCacheAdapter,
     type PaginationParams,
     type PaginationResult,
+    type WhereOptions,
+    type OrderOptions,
 } from "@elizaos/core";
 import type {
     Account,
@@ -108,7 +110,7 @@ export class SqliteDatabaseAdapter
     async createAccount(account: Account): Promise<boolean> {
         try {
             const sql =
-                "INSERT INTO accounts (id, name, username, email, avatarUrl, details, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "INSERT INTO accounts (id, name, username, email, avatarUrl, details, status, pid, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             this.db
                 .prepare(sql)
                 .run(
@@ -118,7 +120,9 @@ export class SqliteDatabaseAdapter
                     account.email,
                     account.avatarUrl,
                     JSON.stringify(account.details),
-                    account.status || "paused"
+                    account.status || "paused",
+                    account.pid || "",
+                    account.source || ""
                 );
             return true;
         } catch (error) {
@@ -1110,33 +1114,12 @@ export class SqliteDatabaseAdapter
       
         const offset = (page - 1) * pageSize;
       
-        const whereClause: string[] = [];
-        
-        // biome-ignore lint/complexity/noForEach: <explanation>
-        Object.entries(where).forEach(([key, value]) => {
-          if (value === null || value === undefined) return;
-          
-          if (typeof value === 'object') {
-            if (key === 'createdAt') {
-              if (value.gte) {
-                whereClause.push(`${key} >= ?`);
-              }
-              if (value.lte) {
-                whereClause.push(`${key} <= ?`);
-              }
-            }
-          } else {
-            whereClause.push(`${key} = ?`);
-          }
-        });
+        const orderClause = this.buildOrderClause(order);
       
-        const orderClause = Object.entries(order)
-          .map(([key, direction]) => `${key} ${direction}`)
-          .join(', ');
-      
+        const { whereClause, whereParams } = this.buildWhereClause(where);
         const whereStr = whereClause.length > 0 
-          ? `WHERE ${whereClause.join(' AND ')}` 
-          : '';
+        ? `WHERE ${whereClause.join(' AND ')}` 
+        : '';
 
         const countQuery = `
           SELECT COUNT(*) as total 
@@ -1147,25 +1130,79 @@ export class SqliteDatabaseAdapter
         const dataQuery = `
           SELECT * 
           FROM ${table} 
-          ${whereStr}
-          ORDER BY ${orderClause}
+          ${whereStr} 
+          ${orderClause} 
           LIMIT ? OFFSET ?
         `;
 
-        const totalResult = await this.db.prepare(countQuery).get();
+        console.log("dataQuery:", dataQuery);
+
+        const totalResult = await this.db.prepare(countQuery).get(...whereParams);
         console.log("totalResult", totalResult);
         const list = await this.db.prepare(dataQuery).all(
-          [pageSize, offset]
+            ...whereParams,
+            pageSize,
+            offset
         );
 
         const total = (totalResult && typeof totalResult === 'object' && 'total' in totalResult) ? Number(totalResult.total) : 0;
       
         return {
-            list,
             total,
             page,
             pageSize,
             totalPages: Math.ceil(total / pageSize),
+            list,
         };
+    }
+
+    buildWhereClause(where: WhereOptions): { whereClause: string[], whereParams: any[] } {
+        const whereClause: string[] = [];
+        const whereParams: any[] = [];
+        
+        // Handle where conditions
+        // biome-ignore lint/complexity/noForEach: <explanation>
+        Object.entries(where).forEach(([key, value]) => {
+            if (value === undefined) return;
+            
+            if (typeof value === 'object') {
+                if ('ne' in value) {
+                whereClause.push(`${key} != ?`);
+                whereParams.push(value.ne);
+                }
+                if ('eq' in value) {
+                whereClause.push(`${key} = ?`);
+                whereParams.push(value.eq);
+                }
+                if ('gt' in value) {
+                whereClause.push(`${key} > ?`);
+                whereParams.push(value.gt);
+                }
+                if ('gte' in value) {
+                whereClause.push(`${key} >= ?`);
+                whereParams.push(value.gte);
+                }
+                if ('lt' in value) {
+                whereClause.push(`${key} < ?`);
+                whereParams.push(value.lt);
+                }
+                if ('lte' in value) {
+                whereClause.push(`${key} <= ?`);
+                whereParams.push(value.lte);
+                }
+            } else {
+                whereClause.push(`${key} = ?`);
+                whereParams.push(value);
+            }
+        });
+        return { whereClause, whereParams };
+    } 
+
+    buildOrderClause(order: OrderOptions): string {
+        if (!order) return '';
+        const orderClause = Object.entries(order)
+          .map(([key, direction]) => `${key} ${direction}`)
+          .join(', ');
+        return orderClause ? ` ORDER BY ${orderClause}` : '';
     }
 }

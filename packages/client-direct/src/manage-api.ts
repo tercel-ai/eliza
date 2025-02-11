@@ -95,6 +95,8 @@ export function createManageApiRouter(
         const params: PaginationParams = {
             page: req.query.page ? Number(req.query.page) : 1,
             pageSize: req.query.pageSize ? Number(req.query.pageSize) : 10,
+            where: req.query.where ? JSON.parse(req.query.where as string) : {},
+            order: req.query.order ? JSON.parse(req.query.order as string) : {createdAt: 'DESC'},
         }
         const result = await directClient.db.paginate('accounts', params);
         if(result.total) {

@@ -410,11 +410,11 @@ export class QdrantDatabaseAdapter  extends DatabaseAdapter<QdrantClient>  imple
 
     async paginate(table: string, params: PaginationParams): Promise<PaginationResult> {
         return Promise.resolve({
-            list: [],
             total: 0,
             page: 1,
             pageSize: 10,
-            totalPages: 1
+            totalPages: 1,
+            list: [],
         });
     }
 }

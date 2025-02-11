@@ -624,7 +624,7 @@ export class ClientBase extends EventEmitter {
             this.runtime.agentId,
             this.profile.username,
             this.runtime.character.name,
-            "twitter"
+            "twitter",
         );
 
         // Save the new tweets as memories

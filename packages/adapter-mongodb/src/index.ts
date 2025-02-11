@@ -1454,31 +1454,18 @@ export class MongoDBDatabaseAdapter
             page = 1,
             pageSize = 10,
             where = {},
-            order = { createdAt: -1 } // MongoDB uses 1 for ASC, -1 for DESC
+            order = { createdAt: 'DESC' }
         } = params;
 
         const skip = (page - 1) * pageSize;
-
-        // Convert where conditions for MongoDB
-        const whereQuery: any = {};
-        // biome-ignore lint/complexity/noForEach: <explanation>
-        Object.entries(where).forEach(([key, value]) => {
-            if (value === null || value === undefined) return;
-
-            if (typeof value === 'object') {
-                if (key === 'createdAt') {
-                    whereQuery[key] = {};
-                    if (value.gte) whereQuery[key].$gte = new Date(value.gte);
-                    if (value.lte) whereQuery[key].$lte = new Date(value.lte);
-                } else {
-                    whereQuery[key] = value;
-                }
-            } else {
-                whereQuery[key] = value;
-            }
-        });
-
+        
         try {
+            // Build MongoDB query conditions
+            const whereQuery = this.buildWhereQuery(where);
+            
+            // Build sort options
+            const sortOptions = this.buildSortOptions(order);
+
             // Get total count
             const total = await this.database.collection(collectionName)
                 .countDocuments(whereQuery);
@@ -1486,22 +1473,68 @@ export class MongoDBDatabaseAdapter
             // Get paginated data
             const list = await this.database.collection(collectionName)
                 .find(whereQuery)
-                .sort(order)
+                .sort(sortOptions)
                 .skip(skip)
                 .limit(pageSize)
                 .toArray();
 
             return {
-                list,
                 total,
                 page,
                 pageSize,
                 totalPages: Math.ceil(total / pageSize),
+                list,
             };
         } catch (error) {
             elizaLogger.error(`Error in paginate for collection ${collectionName}:`, error);
             throw error;
         }
+    }
+
+    private buildWhereQuery(where: Record<string, any>): Record<string, any> {
+        const query: Record<string, any> = {};
+        
+        // biome-ignore lint/complexity/noForEach: <explanation>
+        Object.entries(where).forEach(([key, value]) => {
+            if (value === undefined) return;
+            
+            if (typeof value === 'object') {
+                query[key] = {};
+                
+                // Handle comparison operators
+                if ('ne' in value) query[key].$ne = value.ne;
+                if ('eq' in value) query[key].$eq = value.eq;
+                if ('gt' in value) query[key].$gt = value.gt;
+                if ('gte' in value) query[key].$gte = value.gte;
+                if ('lt' in value) query[key].$lt = value.lt;
+                if ('lte' in value) query[key].$lte = value.lte;
+                
+                // Handle date fields
+                if (key === 'createdAt') {
+                    if (query[key].$gte) query[key].$gte = new Date(query[key].$gte);
+                    if (query[key].$lte) query[key].$lte = new Date(query[key].$lte);
+                }
+                
+                // Remove empty query object
+                if (Object.keys(query[key]).length === 0) {
+                    delete query[key];
+                }
+            } else {
+                query[key] = value;
+            }
+        });
+        
+        return query;
+    }
+
+    private buildSortOptions(order: Record<string, string>): Record<string, 1 | -1> {
+        const sortOptions: Record<string, 1 | -1> = {};
+        
+        // biome-ignore lint/complexity/noForEach: <explanation>
+        Object.entries(order).forEach(([key, direction]) => {
+            sortOptions[key] = direction.toUpperCase() === 'DESC' ? -1 : 1;
+        });
+        return sortOptions;
     }
 }
 

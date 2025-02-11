@@ -421,8 +421,8 @@ export class PostgresDatabaseAdapter
             try {
                 const accountId = account.id ?? v4();
                 await this.pool.query(
-                    `INSERT INTO accounts (id, name, username, email, "avatarUrl", details, status)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                    `INSERT INTO accounts (id, name, username, email, "avatarUrl", details, status, pid, source)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
                     [
                         accountId,
                         account.name,
@@ -431,6 +431,8 @@ export class PostgresDatabaseAdapter
                         account.avatarUrl || "",
                         JSON.stringify(account.details),
                         account.status || "paused",
+                        account.pid || "",
+                        account.source || "",
                     ]
                 );
                 elizaLogger.debug("Account created successfully:", {
@@ -1831,51 +1833,13 @@ export class PostgresDatabaseAdapter
             } = params;
 
             const offset = (page - 1) * pageSize;
-            const whereClause: string[] = [];
-            const values: any[] = [];
-            let paramCount = 0;
-
-            // Build WHERE clause with proper parameter indexing
-            // biome-ignore lint/complexity/noForEach: <explanation>
-            Object.entries(where).forEach(([key, value]) => {
-                if (value === null || value === undefined) return;
-
-                if (typeof value === 'object') {
-                    if (key === 'createdAt') {
-                        if (value.gte) {
-                            paramCount++;
-                            whereClause.push(`"${key}" >= $${paramCount}`);
-                            values.push(value.gte);
-                        }
-                        if (value.lte) {
-                            paramCount++;
-                            whereClause.push(`"${key}" <= $${paramCount}`);
-                            values.push(value.lte);
-                        }
-                    }
-                } else {
-                    paramCount++;
-                    whereClause.push(`"${key}" = $${paramCount}`);
-                    values.push(value);
-                }
-            });
-
-            const whereStr = whereClause.length > 0
-                ? `WHERE ${whereClause.join(' AND ')}`
+            
+            // Build WHERE and ORDER clauses
+            const { whereClause, whereParams } = this.buildWhereClause(where);
+            const whereStr = whereClause.length > 0 
+                ? `WHERE ${whereClause.join(' AND ')}` 
                 : '';
-
-            const orderClause = Object.entries(order)
-                .map(([key, direction]) => `"${key}" ${direction}`)
-                .join(', ');
-
-            // Add LIMIT and OFFSET parameters
-            paramCount++;
-            const limitParam = `$${paramCount}`;
-            values.push(pageSize);
-
-            paramCount++;
-            const offsetParam = `$${paramCount}`;
-            values.push(offset);
+            const orderClause = this.buildOrderClause(order);
 
             // Count total records
             const countQuery = `
@@ -1889,25 +1853,83 @@ export class PostgresDatabaseAdapter
                 SELECT * 
                 FROM "${table}" 
                 ${whereStr}
-                ORDER BY ${orderClause}
-                LIMIT ${limitParam} OFFSET ${offsetParam}
+                ${orderClause}
+                LIMIT $${whereParams.length + 1} 
+                OFFSET $${whereParams.length + 2}
             `;
 
+            elizaLogger.debug("Pagination query:", {
+                dataQuery,
+                whereParams,
+                pageSize,
+                offset
+            });
+
             const [countResult, dataResult] = await Promise.all([
-                this.pool.query(countQuery, values.slice(0, -2)), // Exclude LIMIT/OFFSET params
-                this.pool.query(dataQuery, values)
+                this.pool.query(countQuery, whereParams),
+                this.pool.query(dataQuery, [...whereParams, pageSize, offset])
             ]);
 
             const total = Number(countResult.rows[0].total);
 
             return {
-                list: dataResult.rows,
                 total,
                 page,
                 pageSize,
                 totalPages: Math.ceil(total / pageSize),
+                list: dataResult.rows,
             };
         }, "paginate");
+    }
+
+    private buildWhereClause(where: Record<string, any>): { whereClause: string[], whereParams: any[] } {
+        const whereClause: string[] = [];
+        const whereParams: any[] = [];
+        
+        // Handle where conditions
+        // biome-ignore lint/complexity/noForEach: <explanation>
+        Object.entries(where).forEach(([key, value]) => {
+            if (value === undefined) return;
+            
+            if (typeof value === 'object') {
+                if ('ne' in value) {
+                    whereClause.push(`"${key}" != $${whereParams.length + 1}`);
+                    whereParams.push(value.ne);
+                }
+                if ('eq' in value) {
+                    whereClause.push(`"${key}" = $${whereParams.length + 1}`);
+                    whereParams.push(value.eq);
+                }
+                if ('gt' in value) {
+                    whereClause.push(`"${key}" > $${whereParams.length + 1}`);
+                    whereParams.push(value.gt);
+                }
+                if ('gte' in value) {
+                    whereClause.push(`"${key}" >= $${whereParams.length + 1}`);
+                    whereParams.push(value.gte);
+                }
+                if ('lt' in value) {
+                    whereClause.push(`"${key}" < $${whereParams.length + 1}`);
+                    whereParams.push(value.lt);
+                }
+                if ('lte' in value) {
+                    whereClause.push(`"${key}" <= $${whereParams.length + 1}`);
+                    whereParams.push(value.lte);
+                }
+            } else {
+                whereClause.push(`"${key}" = $${whereParams.length + 1}`);
+                whereParams.push(value);
+            }
+        });
+        
+        return { whereClause, whereParams };
+    }
+
+    private buildOrderClause(order: Record<string, string>): string {
+        const orderClause = Object.entries(order)
+            .map(([key, direction]) => `"${key}" ${direction}`)
+            .join(', ');
+        return orderClause ? ` ORDER BY ${orderClause}` : '';
     }
 }
 

@@ -1164,18 +1164,20 @@ export class AgentRuntime implements IAgentRuntime {
         userId: UUID,
         userName: string | null,
         name: string | null,
-        email?: string | null,
         source?: string | null,
     ) {
         const account = await this.databaseAdapter.getAccountById(userId);
         if (!account) {
+            const email = userId !== this.agentId ? userId : this.character.email || userId;
             await this.databaseAdapter.createAccount({
                 id: userId,
                 name: name || this.character.name || "Unknown User",
                 username: userName || this.character.username || "Unknown",
-                email: email || this.character.email || userId, // Temporary
+                email: email,
                 details: this.character || { summary: "" },
                 status: AccountStatus.ACTIVE,
+                pid: this.agentId === userId ? "" : this.agentId,
+                source: source || "",
             });
             elizaLogger.success(`User ${userName} created successfully.`);
         }

@@ -162,8 +162,8 @@ export class SqlJsDatabaseAdapter
     async createAccount(account: Account): Promise<boolean> {
         try {
             const sql = `
-      INSERT INTO accounts (id, name, username, email, avatarUrl, details, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO accounts (id, name, username, email, avatarUrl, details, status, pid, source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
             const stmt = this.db.prepare(sql);
             stmt.run([
@@ -174,6 +174,8 @@ export class SqlJsDatabaseAdapter
                 account.avatarUrl || "",
                 JSON.stringify(account.details),
                 account.status || "paused",
+                account.pid || "",
+                account.source || ""
             ]);
             stmt.free();
             return true;
@@ -1073,38 +1075,11 @@ export class SqlJsDatabaseAdapter
         } = params;
 
         const offset = (page - 1) * pageSize;
-        const whereClause: string[] = [];
-        const queryParams: any[] = [];
-
-        // Build where clause and params
-        // biome-ignore lint/complexity/noForEach: <explanation>
-        Object.entries(where).forEach(([key, value]) => {
-            if (value === null || value === undefined) return;
-
-            if (typeof value === 'object') {
-                if (key === 'createdAt') {
-                    if (value.gte) {
-                        whereClause.push(`${key} >= ?`);
-                        queryParams.push(value.gte);
-                    }
-                    if (value.lte) {
-                        whereClause.push(`${key} <= ?`);
-                        queryParams.push(value.lte);
-                    }
-                }
-            } else {
-                whereClause.push(`${key} = ?`);
-                queryParams.push(value);
-            }
-        });
-
-        const orderClause = Object.entries(order)
-            .map(([key, direction]) => `${key} ${direction}`)
-            .join(', ');
-
-        const whereStr = whereClause.length > 0
-            ? `WHERE ${whereClause.join(' AND ')}`
+        const { whereClause, whereParams } = this.buildWhereClause(where);
+        const whereStr = whereClause.length > 0 
+            ? `WHERE ${whereClause.join(' AND ')}` 
             : '';
+        const orderClause = this.buildOrderClause(order);
 
         // Count total records
         const countQuery = `
@@ -1113,7 +1088,7 @@ export class SqlJsDatabaseAdapter
             ${whereStr}
         `;
         const countStmt = this.db.prepare(countQuery);
-        countStmt.bind(queryParams);
+        countStmt.bind(whereParams);
         let total = 0;
         if (countStmt.step()) {
             const result = countStmt.getAsObject() as { total: number };
@@ -1126,11 +1101,11 @@ export class SqlJsDatabaseAdapter
             SELECT * 
             FROM ${table} 
             ${whereStr}
-            ORDER BY ${orderClause}
+            ${orderClause}
             LIMIT ? OFFSET ?
         `;
         const dataStmt = this.db.prepare(dataQuery);
-        dataStmt.bind([...queryParams, pageSize, offset]);
+        dataStmt.bind([...whereParams, pageSize, offset]);
         
         const list: any[] = [];
         while (dataStmt.step()) {
@@ -1139,11 +1114,59 @@ export class SqlJsDatabaseAdapter
         dataStmt.free();
 
         return {
-            list,
             total,
             page,
             pageSize,
             totalPages: Math.ceil(total / pageSize),
+            list,
         };
+    }
+
+    private buildWhereClause(where: Record<string, any>): { whereClause: string[], whereParams: any[] } {
+        const whereClause: string[] = [];
+        const whereParams: any[] = [];
+        
+        // biome-ignore lint/complexity/noForEach: <explanation>
+        Object.entries(where).forEach(([key, value]) => {
+            if (value === undefined) return;
+            
+            if (typeof value === 'object') {
+                if ('ne' in value) {
+                    whereClause.push(`${key} != ?`);
+                    whereParams.push(value.ne);
+                }
+                if ('eq' in value) {
+                    whereClause.push(`${key} = ?`);
+                    whereParams.push(value.eq);
+                }
+                if ('gt' in value) {
+                    whereClause.push(`${key} > ?`);
+                    whereParams.push(value.gt);
+                }
+                if ('gte' in value) {
+                    whereClause.push(`${key} >= ?`);
+                    whereParams.push(value.gte);
+                }
+                if ('lt' in value) {
+                    whereClause.push(`${key} < ?`);
+                    whereParams.push(value.lt);
+                }
+                if ('lte' in value) {
+                    whereClause.push(`${key} <= ?`);
+                    whereParams.push(value.lte);
+                }
+            } else {
+                whereClause.push(`${key} = ?`);
+                whereParams.push(value);
+            }
+        });
+        return { whereClause, whereParams };
+    }
+
+    private buildOrderClause(order: Record<string, 'ASC' | 'DESC'>): string {
+        const orderClause = Object.entries(order)
+            .map(([key, direction]) => `${key} ${direction}`)
+            .join(', ');
+        return orderClause ? ` ORDER BY ${orderClause}` : '';
     }
 }

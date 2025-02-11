@@ -560,6 +560,12 @@ export interface Account {
 
     /** Optional status of the account */
     status?: AccountStatus;
+
+    /** Optional parent ID */
+    pid?: string;
+
+    /** Optional source */
+    source?: string;
 }
 
 /**
@@ -974,16 +980,11 @@ export interface PaginationParams {
 }
   
 export interface WhereOptions {
-    createdAt?: {
-      gte?: Date;    // greater than or equal to
-      lte?: Date;    // less than or equal to
-    };
     [key: string]: any;
 }
   
 export interface OrderOptions {
-    field: string;        // sort field
-    direction: 'ASC' | 'DESC';  // sort direction
+    [key: string]: 'ASC' | 'DESC';  // sort direction
 }
 
 export interface PaginationResult {
