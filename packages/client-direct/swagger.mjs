@@ -1,4 +1,7 @@
 import swaggerAutogen from 'swagger-autogen';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const port = process.env.SERVER_PORT ?? 3000;
 const srvUrl = process.env.SERVER_URL ?? 'http://localhost:' + port;
