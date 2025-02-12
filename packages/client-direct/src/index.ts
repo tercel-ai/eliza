@@ -157,6 +157,7 @@ export class DirectClient {
     public loadCharacterTryPath: Function; // Store loadCharacterTryPath functor
     public jsonToCharacter: Function; // Store jsonToCharacter functor
     public db: TypeDatabaseAdapter;
+    public getPlugins: Function; // Store getPlugins functor
 
     constructor() {
         elizaLogger.log("DirectClient constructor");

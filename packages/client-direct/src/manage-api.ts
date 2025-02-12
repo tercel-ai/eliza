@@ -331,5 +331,18 @@ export function createManageApiRouter(
         }
     });
 
+    router.get("/plugins", async (req, res) => {
+        try {
+            const pluginList = await directClient.getPlugins();
+            res.json(pluginList);
+        } catch (err) {
+            elizaLogger.error('Error getting plugins:', err);
+            res.status(500).json({
+                error: "Failed to get plugins list",
+                message: err.message
+            });
+        }
+    });
+
     return router;
 }

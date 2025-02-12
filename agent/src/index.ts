@@ -161,6 +161,7 @@ import { quickIntelPlugin } from "@elizaos/plugin-quick-intel";
 import { v4 as uuidv4 } from "uuid";
 import { trikonPlugin } from "@elizaos/plugin-trikon";
 import arbitragePlugin from "@elizaos/plugin-arbitrage";
+import { getPlugins } from "./plugins";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
@@ -1532,6 +1533,7 @@ const startAgents = async () => {
     directClient.loadCharacterTryPath = loadCharacterTryPath;
     directClient.jsonToCharacter = jsonToCharacter;
     directClient.db = db;
+    directClient.getPlugins = getPlugins;
 
     directClient.start(serverPort);
 
