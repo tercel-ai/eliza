@@ -2,6 +2,9 @@ postgres=>
 -- create user
 CREATE USER eliza WITH PASSWORD 'your_password';
 
+-- add CREATEDB permission to database user
+ALTER USER eliza WITH CREATEDB;
+
 -- switch to eliza role
 SET ROLE eliza;
 
@@ -21,9 +24,6 @@ GRANT ALL PRIVILEGES ON DATABASE eliza TO eliza;
 -- grant schema permissions
 GRANT USAGE ON SCHEMA public TO eliza;
 GRANT CREATE ON SCHEMA public TO eliza;
-
--- add CREATEDB permission to database user
-ALTER USER eliza WITH CREATEDB;
 
 -- grant all permissions to specific schema (usually public)
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO eliza;

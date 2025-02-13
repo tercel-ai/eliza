@@ -1,9 +1,9 @@
 const path = require('path');
-const serviceName = path.basename(__dirname);
+const namePrefix = path.basename(__dirname);
 
 module.exports = {
   apps: [{
-    name: serviceName,
+    name: `${namePrefix}-agent`,
     script: 'pnpm start',
     instances: 1,
     autorestart: true,
