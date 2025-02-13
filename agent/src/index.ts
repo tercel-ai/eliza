@@ -1533,7 +1533,7 @@ const startAgents = async () => {
     directClient.loadCharacterTryPath = loadCharacterTryPath;
     directClient.jsonToCharacter = jsonToCharacter;
     directClient.db = db;
-    directClient.getPlugins = getPlugins;
+    directClient.plugins = await getPlugins();
 
     directClient.start(serverPort);
 

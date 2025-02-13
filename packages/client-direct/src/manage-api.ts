@@ -333,13 +333,39 @@ export function createManageApiRouter(
 
     router.get("/plugins", async (req, res) => {
         try {
-            const pluginList = await directClient.getPlugins();
-            res.json(pluginList);
+            res.json(directClient.plugins);
         } catch (err) {
             elizaLogger.error('Error getting plugins:', err);
             res.status(500).json({
                 error: "Failed to get plugins list",
                 message: err.message
+            });
+        }
+    });
+
+    router.get("/memories", async (req, res, next) => {
+        try {
+            const params: PaginationParams = {
+                page: req.query.page ? Number(req.query.page) : 1,
+                pageSize: req.query.pageSize ? Number(req.query.pageSize) : 10,
+                where: req.query.where ? JSON.parse(req.query.where as string) : {},
+                order: req.query.order ? JSON.parse(req.query.order as string) : {createdAt: 'DESC'},
+            }
+            const result = await directClient.db.paginate('memories', params);
+            if(result.total) {
+                result.list = result.list.map((item: any) => {
+                    if (typeof item.content === "string") {
+                        item.content = item.content ? JSON.parse(item.content) : {};
+                    }
+                    delete item.embedding;
+                    return item;
+                });
+            }
+            res.json(result);
+        } catch (err) {
+            elizaLogger.error('Error in memories', err);
+            res.status(400).json({
+                error: err.message,
             });
         }
     });
