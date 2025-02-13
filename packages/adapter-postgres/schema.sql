@@ -1,3 +1,5 @@
+-- Note: recommend use superuser: postgres to connect database, otherwise execute postgres.pre.sql first.
+
 -- Enable pgvector extension
 
 -- -- Drop existing tables and extensions
