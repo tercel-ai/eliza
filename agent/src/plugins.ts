@@ -66,40 +66,67 @@ async function getPluginInfo(pluginDir: string): Promise<PluginInfo | null> {
 
 export async function getPlugins() {
   try {
-    // get packages directory
-    const packagesDir = path.resolve(__dirname, '../../packages');
-    elizaLogger.log(`Looking for plugins in: ${packagesDir}`);
+    // Read package.json from the agent directory
+    const packageJsonPath = path.resolve(__dirname, '../package.json');
+    elizaLogger.log(`Reading package.json from: ${packageJsonPath}`);
     
-    // Verify the directory exists
-    if (!fs.existsSync(packagesDir)) {
-      elizaLogger.error(`Packages directory not found: ${packagesDir}`);
-      return [];
-    }
-
-    // Read directory contents
-    const entries = fs.readdirSync(packagesDir);
-    // elizaLogger.debug(`Found entries in packages dir:`, entries);
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
     
-    // find all plugin-* directories
-    const pluginDirs = entries
-      .filter(entry => {
-        const fullPath = path.join(packagesDir, entry);
-        const isDir = fs.statSync(fullPath).isDirectory();
-        const isPlugin = entry.startsWith('plugin-');
-        elizaLogger.debug(`Entry ${entry}: isDir=${isDir}, isPlugin=${isPlugin}`);
-        return isDir && isPlugin;
-      })
-      .map(entry => path.join(packagesDir, entry));
-
-    pluginDirs.sort((a, b) => a.localeCompare(b));
-    elizaLogger.info("Found plugin directories:", pluginDirs);
+    // Get all plugin dependencies (starting with @elizaos/plugin-)
+    const pluginPackages = Object.keys(packageJson.dependencies || {})
+      .filter(dep => dep.startsWith('@elizaos/plugin-'))
+      .sort();
     
-    // get all plugin info
+    elizaLogger.info(`Found ${pluginPackages.length} plugin packages in package.json`);
+    
+    // Get plugin info for each package
     const pluginsInfo = await Promise.all(
-      pluginDirs.map(dir => getPluginInfo(dir))
+      pluginPackages.map(async (packageName) => {
+        try {
+          // Import plugin module to get plugin info
+          elizaLogger.log(`Importing plugin module: ${packageName}`);
+          const pluginModule = await import(packageName);
+          const plugin = {};
+          const pluginSuffix = 'Plugin';
+          
+          for (const [key, value] of Object.entries(pluginModule)) {
+            if (key.endsWith(pluginSuffix) && typeof value === 'object') {
+              const pluginName = key.slice(0, -pluginSuffix.length);
+              plugin[key] = {
+                name: value.name || pluginName,
+                description: value.description
+              };
+            }
+          }
+
+          // Try to read README.md from node_modules
+          let document;
+          const nodeModulesDir = path.resolve(__dirname, '../node_modules');
+          const pluginDir = path.join(nodeModulesDir, packageName);
+          
+          try {
+            document = fs.readFileSync(path.join(pluginDir, 'README.md'), 'utf-8');
+          } catch {
+            try {
+              document = fs.readFileSync(path.join(pluginDir, 'readme.md'), 'utf-8');
+            } catch {
+              // if no readme file, ignore
+            }
+          }
+
+          return {
+            package: packageName,
+            plugin,
+            document,
+          };
+        } catch (error) {
+          elizaLogger.error(`Error loading plugin ${packageName}:`, error.message);
+          return null;
+        }
+      })
     );
 
-    // filter out plugins that failed to load
+    // Filter out plugins that failed to load
     const validPlugins = pluginsInfo.filter(Boolean);
     elizaLogger.info(`Successfully loaded ${validPlugins.length} plugins`);
 

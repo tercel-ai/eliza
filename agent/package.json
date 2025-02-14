@@ -96,7 +96,6 @@
         "@elizaos/plugin-twitter": "workspace:*",
         "@elizaos/plugin-primus": "workspace:*",
         "@elizaos/plugin-cronoszkevm": "workspace:*",
-        "@elizaos/plugin-cronos": "workspace:*",
         "@elizaos/plugin-3d-generation": "workspace:*",
         "@elizaos/plugin-fuel": "workspace:*",
         "@elizaos/plugin-avalanche": "workspace:*",
