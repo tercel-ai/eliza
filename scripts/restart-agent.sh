@@ -39,9 +39,17 @@ cleanup_port() {
 
 
 echo "Stopping agent..."
-pm2 stop "${namePrefix}-agent" | grep "${namePrefix}-agent"
-sleep 2
+# Check if the PM2 process exists
+if pm2 list | grep -q "${namePrefix}-agent"; then
+    pm2 stop "${namePrefix}-agent" | grep "${namePrefix}-agent"
+    sleep 2
+fi
 cleanup_port
 
 echo "Starting agent..."
-pm2 start "${namePrefix}-agent"
+# If the process doesn't exist, start with ecosystem.config.js
+if pm2 list | grep -q "${namePrefix}-agent"; then
+    pm2 start "${namePrefix}-agent"
+else
+    pm2 start ecosystem.config.js
+fi
