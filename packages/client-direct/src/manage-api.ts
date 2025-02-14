@@ -85,7 +85,8 @@ export function createManageApiRouter(
         const valid = username === settings.JWT_USERNAME && password === md5(settings.JWT_PASSWORD);
         if (valid) {
             const token = signToken({ username });
-            res.json({ success: true, token: token });
+            const verified = await verifyToken(token);
+            res.json({ success: true, token: token, exp: verified.exp });
         } else {
             res.status(400).json({ error: "Invalid username or password" });
         }
@@ -101,12 +102,16 @@ export function createManageApiRouter(
             }
             const result = await directClient.db.paginate('accounts', params);
             if(result.total) {
-                result.list = result.list.map((item: any) => {
+                for (const item of result.list) {
                     if (typeof item.details === "string") {
                         item.details = item.details ? JSON.parse(item.details) : {};
                     }
-                    return item;
-                });
+                    const agent = agents.get(item.id);
+                    if(!agent && item.status === AccountStatus.ACTIVE) {
+                        item.status = AccountStatus.PAUSED;
+                        await changeAccountStatus(item.id, AccountStatus.PAUSED);
+                    }
+                }
             }
             res.json(result);
         } catch (err) {
@@ -120,6 +125,11 @@ export function createManageApiRouter(
     router.get("/account/:accountId", async (req, res) => {
         const accountId = req.params.accountId as UUID;
         const account = await directClient.db.getAccountById(accountId);
+        const agent = agents.get(accountId);
+        if(!agent && account.status === AccountStatus.ACTIVE) {
+            account.status = AccountStatus.PAUSED;
+            await changeAccountStatus(accountId, AccountStatus.PAUSED);
+        }
         res.json(account);
     });
 
