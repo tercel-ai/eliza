@@ -750,6 +750,9 @@ function initializeDatabase(dataDir: string) {
         const db = new PostgresDatabaseAdapter({
             connectionString: process.env.POSTGRES_URL,
             parseInputs: true,
+            ssl: {
+                rejectUnauthorized: false // for aws postgres, if true, need to set sslmode=verify-full in connection string and set sslcert and sslkey in env
+            }
         });
 
         // Test the connection
