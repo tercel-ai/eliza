@@ -1490,7 +1490,7 @@ const startAgents = async () => {
 
     await db.init();
 
-    let characters = [defaultCharacter];
+    let characters = [];
 
     if (process.env.IQ_WALLET_ADDRESS && process.env.IQSOlRPC) {
         characters = await loadCharacterFromOnchain();
