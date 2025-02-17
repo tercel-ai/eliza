@@ -1174,7 +1174,7 @@ export class AgentRuntime implements IAgentRuntime {
                 name: name || this.character.name || "Unknown User",
                 username: userName || this.character.username || "Unknown",
                 email: email,
-                details: this.character || { summary: "" },
+                details: this.formatCharacterForSave(this.character) || { summary: "" },
                 status: AccountStatus.ACTIVE,
                 pid: this.agentId === userId ? "" : this.agentId,
                 source: source || "",
@@ -1777,6 +1777,18 @@ Text: ${attachment.text}
 
     setVerifiableInferenceAdapter(adapter: IVerifiableInferenceAdapter): void {
         this.verifiableInferenceAdapter = adapter;
+    }
+
+    formatCharacterForSave(character: Character): Character {
+        const data: any = {...character};
+        const plugins: string[] = [];
+        for (const plugin of data.plugins) {
+            if (plugin.package && !plugins.includes(plugin.package)) {
+                plugins.push(plugin.package);
+            }
+        }
+        data.plugins = plugins;
+        return data;
     }
 }
 

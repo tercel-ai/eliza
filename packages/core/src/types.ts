@@ -637,6 +637,9 @@ export type Plugin = {
     /** Plugin description */
     description: string;
 
+    /** Plugin package name */
+    package?: string;
+
     /** Optional actions */
     actions?: Action[];
 

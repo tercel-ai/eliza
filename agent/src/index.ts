@@ -520,7 +520,10 @@ async function handlePluginImporting(plugins: string[] | any[]) {
                 const importedPlugin = await import(plugin);
                 // if the plugin exports a plugins object, it's a multi-plugin package, e.g. @elizaos/coinbase
                 if (importedPlugin.plugins) {
-                    return Object.values(importedPlugin.plugins);
+                    return Object.values(importedPlugin.plugins).map(pluginObj => {
+                        pluginObj.package = plugin;
+                        return pluginObj;
+                    });
                 }
                 
                 // single plugin package processing logic
@@ -529,7 +532,9 @@ async function handlePluginImporting(plugins: string[] | any[]) {
                         .replace("@elizaos/plugin-", "")
                         .replace(/-./g, (x) => x[1].toUpperCase()) +
                     "Plugin";
-                return importedPlugin.default || importedPlugin[functionName];
+                const pluginObj = importedPlugin.default || importedPlugin[functionName];
+                pluginObj.package = plugin;
+                return pluginObj;
             } catch (importError) {
                 elizaLogger.error(
                     `Failed to import plugin: ${plugin}`,
@@ -539,7 +544,7 @@ async function handlePluginImporting(plugins: string[] | any[]) {
             }
         })
     );
-    return importedPlugins.filter(Boolean);
+    return importedPlugins.flat().filter(Boolean);
 }
 
 export function getTokenForProvider(
@@ -1534,7 +1539,6 @@ const startAgents = async () => {
     directClient.startAgent = async (character) => {
         // Handle plugins
         character.plugins = await handlePluginImporting(character.plugins);
-
         // wrap it so we don't have to inject directClient later
         return startAgent(character, directClient, db);
     };
