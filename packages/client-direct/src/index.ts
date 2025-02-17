@@ -122,6 +122,10 @@ interface UUIDParams {
     roomId?: UUID;
 }
 
+interface SwaggerRequest extends ExpressRequest {
+    swaggerDoc?: any;
+}
+
 export function validateUUIDParams(
     params: { agentId: string; roomId?: string },
     res: express.Response
@@ -175,7 +179,18 @@ export class DirectClient {
             if(fs.existsSync(swaggerManageApiPath)) {
                 const swaggerDocument = JSON.parse(fs.readFileSync(swaggerManageApiPath, 'utf8'));
                 elizaLogger.log('Swagger documentation loaded');
-                this.app.use('/docs-manage', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+                
+                // Add middleware to dynamically set host based on request
+                this.app.use('/docs-manage', (req: SwaggerRequest, res, next) => {
+                    // Create a new copy of swagger document for this request
+                    const dynamicSwaggerDoc = { ...swaggerDocument };
+                    // Set host based on request headers
+                    dynamicSwaggerDoc.host = req.get('host');
+                    // Attach to request for use in next middleware
+                    req.swaggerDoc = dynamicSwaggerDoc;
+                    next();
+                }, swaggerUi.serve, swaggerUi.setup((req: SwaggerRequest) => req.swaggerDoc));
+                
             } else {
                 elizaLogger.error('Swagger manage api documentation not found:', swaggerManageApiPath);
             }
