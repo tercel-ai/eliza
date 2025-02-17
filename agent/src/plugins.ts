@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 interface PluginInfo {
   package: string;
+  name: string;
   plugin: {
     [key: string]: {
       name: string;
@@ -55,6 +56,7 @@ async function getPluginInfo(pluginDir: string): Promise<PluginInfo | null> {
 
     return {
       package: packageJson.name,
+      name: packageJson.name.startsWith('@elizaos/plugin-') ? packageJson.name.slice(16) : packageJson.name,
       plugin,
       document,
     };
@@ -116,6 +118,7 @@ export async function getPlugins() {
 
           return {
             package: packageName,
+            name: packageName.startsWith('@elizaos/plugin-') ? packageName.slice(16) : packageName,
             plugin,
             document,
           };
