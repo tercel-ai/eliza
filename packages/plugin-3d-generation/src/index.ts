@@ -190,10 +190,12 @@ const ThreeDGeneration: Action = {
     ],
 } as Action;
 
-export const ThreeDGenerationPlugin: Plugin = {
+export const threeDGenerationPlugin: Plugin = {
     name: "3DGeneration",
     description: "Generate 3D using Hyper 3D",
     actions: [ThreeDGeneration],
     evaluators: [],
     providers: [],
 };
+
+export default threeDGenerationPlugin;

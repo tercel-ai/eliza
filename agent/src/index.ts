@@ -58,7 +58,7 @@ import createGoatPlugin from "@elizaos/plugin-goat";
 import createZilliqaPlugin from "@elizaos/plugin-zilliqa";
 
 // import { intifacePlugin } from "@elizaos/plugin-intiface";
-import { ThreeDGenerationPlugin } from "@elizaos/plugin-3d-generation";
+import { threeDGenerationPlugin } from "@elizaos/plugin-3d-generation";
 import { abstractPlugin } from "@elizaos/plugin-abstract";
 import { akashPlugin } from "@elizaos/plugin-akash";
 import { alloraPlugin } from "@elizaos/plugin-allora";
@@ -518,6 +518,12 @@ async function handlePluginImporting(plugins: string[] | any[]) {
 
             try {
                 const importedPlugin = await import(plugin);
+                // if the plugin exports a plugins object, it's a multi-plugin package, e.g. @elizaos/coinbase
+                if (importedPlugin.plugins) {
+                    return Object.values(importedPlugin.plugins);
+                }
+                
+                // single plugin package processing logic
                 const functionName =
                     plugin
                         .replace("@elizaos/plugin-", "")
@@ -1128,7 +1134,7 @@ export async function createAgent(
             getSecret(character, "LIVEPEER_GATEWAY_URL")
                 ? imageGenerationPlugin
                 : null,
-            getSecret(character, "FAL_API_KEY") ? ThreeDGenerationPlugin : null,
+            getSecret(character, "FAL_API_KEY") ? threeDGenerationPlugin : null,
             ...(getSecret(character, "COINBASE_API_KEY") &&
             getSecret(character, "COINBASE_PRIVATE_KEY")
                 ? [
