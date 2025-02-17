@@ -162,6 +162,7 @@ import { v4 as uuidv4 } from "uuid";
 import { trikonPlugin } from "@elizaos/plugin-trikon";
 import arbitragePlugin from "@elizaos/plugin-arbitrage";
 import { getPlugins } from "./plugins";
+import { getClients } from "./client";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
@@ -1547,7 +1548,7 @@ const startAgents = async () => {
     directClient.jsonToCharacter = jsonToCharacter;
     directClient.db = db;
     directClient.plugins = await getPlugins();
-
+    directClient.clients = await getClients();
     directClient.start(serverPort);
 
     if (serverPort !== Number.parseInt(settings.SERVER_PORT || "3000")) {

@@ -158,7 +158,8 @@ export class DirectClient {
     public jsonToCharacter: Function; // Store jsonToCharacter functor
     public db: TypeDatabaseAdapter;
     public plugins: any[];
-
+    public clients: any[];
+    
     constructor() {
         elizaLogger.log("DirectClient constructor");
         this.app = express();

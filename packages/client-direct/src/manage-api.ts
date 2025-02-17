@@ -16,6 +16,7 @@ import {
     AccountStatus,
     stringToUuid,
     settings,
+    ModelProviderName,
 } from "@elizaos/core";
 
 import type { DirectClient } from ".";
@@ -378,6 +379,23 @@ export function createManageApiRouter(
                 error: err.message,
             });
         }
+    });
+
+    router.get("/clients", async (req, res) => {
+        try {
+            res.json(directClient.clients);
+        } catch (err) {
+            elizaLogger.error('Error getting clients:', err);
+            res.status(500).json({
+                error: "Failed to get clients list",
+                message: err.message
+            });
+        }
+    });
+
+    router.get("/providers", async (req, res) => {
+        const providers = Object.values(ModelProviderName);
+        res.json(providers);
     });
 
     return router;
