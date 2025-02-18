@@ -25,13 +25,13 @@ pnpm add @elizaos/client-github
 
 The GitHub client requires the following environment variables:
 
-| Variable           | Description                        | Required |
-|-------------------|------------------------------------|----------|
-| `GITHUB_OWNER`    | Owner of the GitHub repository     | Yes      |
-| `GITHUB_REPO`     | Repository name                    | Yes      |
-| `GITHUB_BRANCH`   | Target branch (default: `main`)    | Yes      |
-| `GITHUB_PATH`     | Path to focus on within the repo   | Yes      |
-| `GITHUB_API_TOKEN`| GitHub API token for authentication| Yes      |
+```env
+GITHUB_OWNER=Owner of the GitHub repository
+GITHUB_REPO=Repository name
+GITHUB_BRANCH=Target branch (default: `main`)
+GITHUB_PATH=Path to focus on within the repo
+GITHUB_API_TOKEN=GitHub API token for authentication
+```
 
 ## Usage
 

@@ -1,8 +1,18 @@
-# Massa Plugin
+# @elizaos/plugin-massa
 
 ## Overview
 
 This plugin aims to be the basis of all interactions with the Massa ecosystem.
+
+## Configuration
+
+### Environment Variables
+
+```env
+MASSA_PRIVATE_KEY=
+MASSA_RPC_URL=
+```
+
 
 ## Adding a new action
 

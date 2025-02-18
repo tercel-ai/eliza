@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-avalanche
 
 The plugin requires the following environment variable:
 
-```typescript
+```env
 AVALANCHE_PRIVATE_KEY=<Your Avalanche private key>
 ```
 

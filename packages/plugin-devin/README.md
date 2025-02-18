@@ -12,7 +12,7 @@ pnpm add @elizaos/plugin-devin
 
 The plugin requires a Devin API token for authentication. Set the following environment variable:
 
-```bash
+```env
 DEVIN_API_TOKEN=your_api_token_here
 ```
 

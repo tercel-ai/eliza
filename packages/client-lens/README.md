@@ -21,7 +21,7 @@ This package provides a robust client implementation for interacting with the Le
 
 Required environment variables:
 
-```base
+```env
 EVM_PRIVATE_KEY=<your-private-key>
 LENS_PROFILE_ID=<your-lens-profile-id>
 STORJ_API_USERNAME=<storj-username>

@@ -18,10 +18,9 @@ npm install @elizaos/client-xmtp
 ```
 
 ## Prerequisites
-
-- Node.js
-- An EVM private key (set as environment variable `EVM_PRIVATE_KEY`)
-- Access to XMTP network
+```env
+EVM_PRIVATE_KEY=your_private_key_here
+```
 
 ## Usage
 ```

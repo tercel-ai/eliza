@@ -137,17 +137,10 @@ pnpm add @elizaos/plugin-obsidian
 
 The plugin requires the following character secret settings:
 
-```json
-{
-    "settings": {
-        "secrets": {
-            "OBSIDIAN_API_TOKEN": "your-obsidian-api-token",
-            "OBSIDIAN_API_PORT": "your-obsidian-api-port", // Optional (default: 27123)
-            "OBSIDIAN_API_URL": "https://your-obsidian-api-url" , // Optional (default: "http://127.0.0.1:27123")
-        },
-        // other settings...
-    }
-}
+```env
+OBSIDIAN_API_TOKEN=your-obsidian-api-token
+OBSIDIAN_API_PORT=your-obsidian-api-port // Optional (default: 27123)
+OBSIDIAN_API_URL=https://your-obsidian-api-url // Optional (default: "http://127.0.0.1:27123")
 ```
 
 ## Usage

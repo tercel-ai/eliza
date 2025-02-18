@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-tts
 
 The plugin requires the following environment variable or runtime setting to be set:
 
-```typescript
+```env
 FAL_API_KEY=<Your FAL.ai API key>
 ```
 

@@ -12,19 +12,9 @@ By default, **Arthera** is enabled. To use it, simply add your private key to th
 
 ```env
 ARTHERA_PRIVATE_KEY=your-private-key-here
-```
 
-### Custom RPC URLs
-
-By default, the RPC URL is inferred from the `viem/chains` config. To use a custom RPC URL for a specific chain, add the following to your `.env` file:
-
-```env
-ETHEREUM_PROVIDER_<CHAIN_NAME>=https://your-custom-rpc-url
-```
-
-**Example usage:**
-
-```env
+# Custom RPC URLs
+#ETHEREUM_PROVIDER_<CHAIN_NAME>=https://your-custom-rpc-url
 ETHEREUM_PROVIDER_ARTHERA=https://rpc.arthera.net
 ```
 

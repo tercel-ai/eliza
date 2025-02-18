@@ -2,6 +2,16 @@
 
 This is a plugin for using Eliza to interact with the Avail DA network. Defaults to Turing testnet, but can be customized to use Mainnet by changing the RPC in the `.env` file at `AVAIL_RPC_URL`.
 
+## Configuration
+
+The plugin requires the following environment variables to be set:
+
+```env
+AVAIL_ADDRESS=your_avail_address
+AVAIL_SEED=your_avail_seed
+```
+
+
 ## Actions
 - **transfer**: This action enables the transfer of AVAIL tokens from the agent's wallet (as defined by the keyring generated from `AVAIL_SEED`) to another wallet. To use just mention the transfer of AVAIL tokens to an Avail account.
 

@@ -21,7 +21,16 @@ Set the following environment variables:
 ```env
 WALLET_PRIVATE_KEY=your_private_key
 ZERO_EX_API_KEY=your_0x_api_key
-{chain}_RPC_URL=your_rpc_endpoint
+ETH_RPC_URL=your_rpc_url
+OPTIMISM_RPC_URL=your_rpc_url
+BSC_RPC_URL=your_rpc_url
+POLYGON_RPC_URL=your_rpc_url
+BASE_RPC_URL=your_rpc_url
+ARBITRUM_RPC_URL=your_rpc_url
+AVALANCHE_RPC_URL=your_rpc_url
+LINEA_RPC_URL=your_rpc_url
+SCROLL_RPC_URL=your_rpc_url
+BLAST_RPC_URL=your_rpc_url
 ```
 
 ## Installation

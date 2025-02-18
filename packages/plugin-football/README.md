@@ -48,9 +48,9 @@ To use this plugin, you need an API key from [Football-Data.org](https://www.foo
 1. Register and obtain your API key from Football-Data.org.
 2. Add the API key to your `.env` file:
 
-    ```env
-    FOOTBALL_API_KEY=your_api_key_here
-    ```
+```env
+FOOTBALL_API_KEY=your_api_key_here
+```
 
 The plugin will use this key to authenticate requests.
 

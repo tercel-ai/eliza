@@ -2,6 +2,16 @@
 
 A comprehensive plugin for interacting with the Injective chain through ElizaOS.
 
+## Configuration
+
+```env
+INJECTIVE_NETWORK=
+INJECTIVE_PRIVATE_KEY=
+INJECTIVE_PUBLIC_KEY=
+EVM_PUBLIC_KEY=
+
+```
+
 ## Project Structure
 
 ```

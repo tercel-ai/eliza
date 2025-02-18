@@ -16,7 +16,7 @@ docker run --rm -p 8090:8090 phalanetwork/tappd-simulator:latest
 ```
 
 When using the provider through the runtime environment, ensure the following settings are configured:
-```shell
+```env
  # Optional, for simulator purposes if testing on mac or windows. Leave empty for Linux x86 machines.
 TEE_MODE="LOCAL"                    # LOCAL | DOCKER | PRODUCTION
 WALLET_SECRET_SALT= "<your-secret-salt>"            # ONLY define if you want to use TEE Plugin, otherwise it will throw errors

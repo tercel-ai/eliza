@@ -7,7 +7,7 @@ For supported chains and tokens, please refer to the [Squid Router documentation
 ## Configuration
 
 The plugin requires the following configuration:
-```
+```env
 # Squid Router
 SQUID_SDK_URL=https://apiplus.squidrouter.com # Default: https://apiplus.squidrouter.com
 SQUID_INTEGRATOR_ID= # get integrator id through https://docs.squidrouter.com/

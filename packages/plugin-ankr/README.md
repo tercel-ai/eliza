@@ -1,10 +1,42 @@
-
-## Ankr Plugin Guide
-![alt text](assets/ankr.jpg)
+# @elizaos/plugin-ankr
 
 <div align="center">
-  <h3>🔗 Blockchain Data Query Interface</h3>
+  <h3>🔗 Blockchain Data Query Plugin for ElizaOS</h3>
+  <p>A comprehensive interface for querying blockchain data across multiple networks</p>
 </div>
+
+## Overview
+
+The Ankr Plugin provides a robust interface for querying blockchain data through natural language prompts. It supports multiple chains including Ethereum, BSC, Polygon, Avalanche, Optimism, and Base.
+
+## Features
+
+- 🔍 Multi-chain support
+- 💰 Token and NFT queries
+- 📊 Blockchain statistics
+- 👛 Wallet analysis
+- 🔄 Transaction tracking
+- 💎 Price tracking
+
+## Installation
+
+## Configuration
+
+### Environment Variables
+
+```env
+ANKR_ENV=production
+ANKR_WALLET=your_wallet_address
+
+# optional
+ANKR_MAX_RETRIES=3
+ANKR_RETRY_DELAY=1000
+ANKR_TIMEOUT=5000
+ANKR_GRANULAR_LOG=true
+ANKR_LOG_LEVEL=info
+ANKR_RUNTIME_CHECK_MODE=false
+ANKR_SPASH=false
+```
 
 ### Available Actions
 

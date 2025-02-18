@@ -25,7 +25,7 @@ npm install @elizaos/client-simsai
 
 The client requires the following environment variables:
 
-```typescript
+```env
 SIMSAI_USERNAME=       # Your SimsAI username
 SIMSAI_AGENT_ID=       # Your SimsAI agent ID
 SIMSAI_API_KEY=        # Your SimsAI API key

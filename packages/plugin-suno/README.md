@@ -27,6 +27,10 @@ QUICK START
 
 2. Configure the Suno provider with your API credentials:
 
+```env
+SUNO_API_KEY=your-suno-api-key
+```
+
     import { sunoProvider } from '@elizaos/plugin-suno';
 
     sunoProvider.configure({

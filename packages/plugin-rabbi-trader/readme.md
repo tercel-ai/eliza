@@ -22,15 +22,16 @@ npm install @elizaos/plugin-rabbi-trader
 ## Prerequisites
 
 The following environment variables need to be configured:
-
-- `WALLET_PRIVATE_KEY`: Your Solana wallet private key
-- `WALLET_PUBLIC_KEY`: Your Solana wallet public address
-- `SOLANA_RPC_URL`: Solana RPC endpoint (defaults to mainnet)
-- `BIRDEYE_API_KEY`: API key for Birdeye data provider
-- `TWITTER_ENABLED`: Enable/disable Twitter notifications
-- `TWITTER_USERNAME`: Twitter username for notifications
-- `DEXSCREENER_WATCHLIST_ID`: DexScreener watchlist identifier
-- `COINGECKO_API_KEY`: CoinGecko API key for additional market data
+```env
+WALLET_PRIVATE_KEY= Your Solana wallet private key
+WALLET_PUBLIC_KEY= Your Solana wallet public address
+SOLANA_RPC_URL= Solana RPC endpoint (defaults to mainnet)
+BIRDEYE_API_KEY= API key for Birdeye data provider
+TWITTER_ENABLED= Enable/disable Twitter notifications
+TWITTER_USERNAME= Twitter username for notifications
+DEXSCREENER_WATCHLIST_ID= DexScreener watchlist identifier
+COINGECKO_API_KEY= CoinGecko API key for additional market data
+```
 
 ## Usage
 

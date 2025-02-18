@@ -21,9 +21,10 @@ npm install @elizaos/client-deva
 ## Prerequisites
 
 The following environment variables are required:
-
-- `DEVA_API_KEY`: Your Deva API authentication key
-- `DEVA_API_BASE_URL`: The base URL for the Deva API
+```env
+DEVA_API_KEY=Your Deva API authentication key
+DEVA_API_BASE_URL=The base URL for the Deva API
+```
 
 ## Usage
 ```typescript

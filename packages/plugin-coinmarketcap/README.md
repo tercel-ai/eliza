@@ -22,7 +22,7 @@ npm install @elizaos/plugin-coinmarketcap
 
 2. Set up your environment variables:
 
-```bash
+```env
 COINMARKETCAP_API_KEY=your_api_key
 ```
 

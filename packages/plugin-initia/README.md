@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-initia
 
 ## Configuration
 
-```bash
+```env
 INITIA_PRIVATE_KEY=0x1234...abcd
 INITIA_NODE_URL=https://...
 INITIA_CHAIN_ID=initiaion-2

@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-cronoszkevm
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 CRONOSZKEVM_ADDRESS=<Your Cronos zkEVM wallet address>
 CRONOSZKEVM_PRIVATE_KEY=<Your Cronos zkEVM private key>
 ```

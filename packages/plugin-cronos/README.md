@@ -234,24 +234,17 @@ CRONOS_PRIVATE_KEY=0x...
 - Use separate keys for mainnet and testnet
 - Monitor your wallet for unauthorized transactions
 
-### Setup
 
-1. Create `.env` file:
-```env
-CRONOS_PRIVATE_KEY=0x...  # Mainnet
+## Development
+
+### Building
+```bash
+npm run build
+npm run dev # Development mode with watch
 ```
 
-2. For testnet development, use `.env.local`:
-```env
-CRONOS_PRIVATE_KEY=0x...  # Testnet only
-```
-
-3. Add to `.gitignore`:
-```
-.env
-.env.*
-```
-
-## License
-
-MIT
+### Running Tests
+```bash
+npm test # Run tests
+npm test:watch # Watch mode
+npm test:coverage # Gene

@@ -16,9 +16,9 @@ pnpm install @elizaos/plugin-moralis
 
 Set up your environment with the required Moralis API key:
 
-| Variable Name     | Description          |
-| ----------------- | -------------------- |
-| `MORALIS_API_KEY` | Your Moralis API key |
+```env
+MORALIS_API_KEY=
+```
 
 ## Usage
 

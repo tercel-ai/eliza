@@ -35,7 +35,7 @@ pnpm add @elizaos/plugin-movement
 
 Set up your environment variables in the `.env` file:
 
-```bash
+```env
 MOVEMENT_PRIVATE_KEY=your_private_key_here
 MOVEMENT_NETWORK=bardock
 ```

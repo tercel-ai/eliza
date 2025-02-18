@@ -12,6 +12,19 @@ The DKG plugin extends ElizaOS functionality by allowing agents to interact with
 pnpm install @elizaos/plugin-dkg
 ```
 
+## Configuration
+
+The plugin requires the following environment variables to be set:
+
+```env
+DKG_ENVIRONMENT=<DKG environment>
+DKG_HOSTNAME=<DKG hostname>
+DKG_PORT=<DKG port>
+DKG_BLOCKCHAIN_NAME=<DKG blockchain name>
+DKG_PUBLIC_KEY=<DKG public key>
+DKG_PRIVATE_KEY=<DKG private key>
+```
+
 ## Features
 
 ### 1. DKG Integration

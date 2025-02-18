@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-abstract
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 ABSTRACT_ADDRESS=<Your Abstract wallet address>
 ABSTRACT_PRIVATE_KEY=<Your Abstract private key>
 ```

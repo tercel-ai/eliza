@@ -51,7 +51,7 @@ export const XmtpClientInterface: Client = {
             elizaRuntime = runtime;
 
             xmtp = await xmtpClient({
-                walletKey: process.env.EVM_PRIVATE_KEY as string,
+                walletKey: runtime.getSetting("EVM_PRIVATE_KEY") || process.env.EVM_PRIVATE_KEY as string,
                 onMessage,
             });
 

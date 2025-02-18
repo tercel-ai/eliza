@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-router-nitro
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 ROUTER_NITRO_EVM_PRIVATE_KEY=<Your EVM-compatible private key>
 ROUTER_NITRO_EVM_ADDRESS=<Router Nitro EVM bridge address>
 ```

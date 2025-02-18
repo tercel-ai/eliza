@@ -46,11 +46,13 @@ npm install @elizaos/plugin-apro
 ## Configuration
 
 Configure the plugin by setting environment variables or runtime settings:
-- APRO_RPC_URL
-- APRO_PROXY_ADDRESS
-- APRO_PRIVATE_KEY
-- APRO_CONVERTER_ADDRESS
-- APRO_AUTO_HASH_DATA
+```env
+APRO_RPC_URL=your_rpc_url
+APRO_PROXY_ADDRESS=your_proxy_address
+APRO_PRIVATE_KEY=your_private_key
+APRO_CONVERTER_ADDRESS=your_converter_address
+APRO_AUTO_HASH_DATA=true
+```
 
 ## Usage
 

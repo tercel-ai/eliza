@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-quickintel
 
 ### Environment Variables
 
-```typescript
+```env
 QUICKINTEL_API_KEY=<Your QuickIntel API Key>
 ```
 

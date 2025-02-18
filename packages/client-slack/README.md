@@ -94,15 +94,15 @@ Before proceeding to install the app, make sure to verify the event subscription
 ### Step 3: Configure Environment Variables
 
 1. Create or edit `.env` file in your project root:
-    ```bash
-    SLACK_APP_ID=           # From Basic Information > App Credentials > App ID
-    SLACK_CLIENT_ID=        # From Basic Information > App Credentials > Client ID
-    SLACK_CLIENT_SECRET=    # From Basic Information > App Credentials > Client Secret
-    SLACK_SIGNING_SECRET=   # From Basic Information > App Credentials > Signing Secret
-    SLACK_BOT_TOKEN=        # From OAuth & Permissions > Bot User OAuth Token (starts with xoxb-)
-    SLACK_VERIFICATION_TOKEN= # From Basic Information > App Credentials > Verification Token
-    SLACK_SERVER_PORT=3069  # Must match the port you used with ngrok
-    ```
+```env
+SLACK_APP_ID=           # From Basic Information > App Credentials > App ID
+SLACK_CLIENT_ID=        # From Basic Information > App Credentials > Client ID
+SLACK_CLIENT_SECRET=    # From Basic Information > App Credentials > Client Secret
+SLACK_SIGNING_SECRET=   # From Basic Information > App Credentials > Signing Secret
+SLACK_BOT_TOKEN=        # From OAuth & Permissions > Bot User OAuth Token (starts with xoxb-)
+SLACK_VERIFICATION_TOKEN= # From Basic Information > App Credentials > Verification Token
+SLACK_SERVER_PORT=3069  # Must match the port you used with ngrok
+```
 
 ### Step 4: Install the App
 

@@ -19,7 +19,7 @@ AI-powered email automation plugin for Eliza that intelligently detects email-wo
 ## Configuration
 
 ### AI Email Automation Setup
-```typescript
+```env
 # Required
 RESEND_API_KEY=           # Your Resend API key
 DEFAULT_TO_EMAIL=         # Default recipient

@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-conflux
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 CONFLUX_CORE_PRIVATE_KEY=<Your Conflux Core Space private key>
 CONFLUX_CORE_SPACE_RPC_URL=<Conflux Core Space RPC endpoint>
 CONFLUX_MEME_CONTRACT_ADDRESS=<ConfiPump contract address>

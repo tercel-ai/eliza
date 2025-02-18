@@ -23,7 +23,7 @@ pnpm install
 
 The client requires the following environment variables:
 
-```bash
+```env
 # Discord API Credentials
 DISCORD_APPLICATION_ID=your_application_id
 DISCORD_API_TOKEN=your_api_token

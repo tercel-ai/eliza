@@ -16,9 +16,9 @@ pnpm add @elizaos/plugin-giphy
 
 Set up your environment with the required Giphy API key:
 
-| Variable Name | Description |
-|--------------|-------------|
-| `GIPHY_API_KEY` | Giphy API key for authenticating requests |
+```env
+GIPHY_API_KEY=Giphy API key for authenticating requests
+```
 
 You need to obtain an API key by signing up at [Giphy Developers](https://developers.giphy.com/).
 

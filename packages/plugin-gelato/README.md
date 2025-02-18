@@ -31,7 +31,7 @@ pnpm install elizaos/plugin-gelato
 
 Fill out the `.env` file in the project root with the following variables:
 
-```
+```env
 GELATO_RELAY_API_KEY=<Your Gelato Relay API Key>
 EVM_PROVIDER_URL=<Your EVM provider URL (e.g., Alchemy or Infura endpoint)>
 EVM_PRIVATE_KEY=<Your wallet's private key>

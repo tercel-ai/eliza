@@ -23,7 +23,7 @@ npm install @elizaos/plugin-zerion
 
 2. Set up your environment variables:
 
-```bash
+```env
 ZERION_API_KEY=your_api_key
 ```
 

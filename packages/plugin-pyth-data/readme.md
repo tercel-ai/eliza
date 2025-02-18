@@ -55,7 +55,6 @@ Show me available forex feeds
 
 Create a `.env` file in your project root with the following variables:
 
-### Network Configuration
 ```env
 # Network Environment (mainnet or testnet)
 PYTH_NETWORK_ENV=mainnet
@@ -73,19 +72,14 @@ PYTH_TESTNET_WSS_URL=wss://hermes.pyth.network/ws
 PYTH_TESTNET_PYTHNET_URL=https://pythnet.rpcpool.com
 PYTH_TESTNET_CONTRACT_REGISTRY=https://pyth.network/developers/price-feed-ids#testnet
 PYTH_TESTNET_PROGRAM_KEY=FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH
-```
 
-### Connection Settings
-```env
+# Connection Settings
 PYTH_MAX_RETRIES=3
 PYTH_RETRY_DELAY=1000
 PYTH_TIMEOUT=5000
 PYTH_GRANULAR_LOG=true
 PYTH_LOG_LEVEL=info
-```
 
-### Runtime Settings
-```env
 # General runtime configuration
 RUNTIME_CHECK_MODE=false
 

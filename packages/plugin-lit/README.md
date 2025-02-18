@@ -17,6 +17,15 @@ A plugin that integrates Lit Protocol functionality into the elizaOS runtime env
 npm install @elizaos/plugin-lit
 ```
 
+## Configuration
+
+### Environment Variables
+
+```env
+EVM_PRIVATE_KEY=<Your EVM wallet private key>
+```
+
+
 ## Setup
 
 There are two ways to register the plugin:

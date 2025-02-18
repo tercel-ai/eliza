@@ -9,7 +9,13 @@ This plugin integrates a Telegram client with ElizaOS, allowing characters in El
 - **Startup Logging**: Logs successful initialization of the Telegram client for better debugging.
 - **Future-proof Design**: Provides a basic structure for stopping the client (currently unsupported).
 
+
 ## Configuration Options
+
+```env
+# Required configuration
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+```
 
 Here are the available configuration options for the `character.json` file:
 

@@ -12,9 +12,10 @@ pnpm add @elizaos/plugin-trikon
 ## Configuration
 
 The plugin requires the following environment variables:
-
-- `TRIKON_WALLET_ADDRESS`: Your Trikon wallet address (must be a valid 64-character hex string starting with '0x')
-- `TRIKON_INITIAL_BALANCE`: (Optional) The initial balance for the wallet. Defaults to "0" if not provided.
+```env
+TRIKON_WALLET_ADDRESS= Your Trikon wallet address (must be a valid 64-character hex string starting with '0x')
+TRIKON_INITIAL_BALANCE= (Optional) The initial balance for the wallet. Defaults to "0" if not provided.
+```
 
 ## Usage
 

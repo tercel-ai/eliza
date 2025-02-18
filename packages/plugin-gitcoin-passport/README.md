@@ -17,6 +17,11 @@ Just add it under your character profile in plugins as
 
 ## Configuration
 
+```env
+PASSPORT_API_KEY=Your API key
+PASSPORT_SCORER=Your Scorer ID
+```
+
 Getting Your API Key
 
 1. Log in to the developer portal: Go to developer.passport.xyz and log in to your account by connecting your wallet.

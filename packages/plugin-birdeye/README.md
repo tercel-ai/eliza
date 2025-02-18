@@ -2,6 +2,15 @@
 
 A powerful plugin for Eliza that integrates with Birdeye's comprehensive DeFi and token analytics API. This plugin provides real-time access to blockchain data, token metrics, and DeFi analytics across multiple networks.
 
+## Configuration
+
+Set the following environment variables:
+
+```env
+BIRDEYE_WALLET_ADDR=your_wallet_address
+```
+
+
 ## Features
 
 ### Provider Featurs

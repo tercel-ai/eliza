@@ -23,8 +23,8 @@ npm install @elizaos/client-direct
 ## Configuration
 
 Set the following environment variables:
-env
-```
+
+```env
 SERVER_PORT=3000 # API server port
 SERVER_URL=http://localhost:3000 # API server URL
 EXPRESS_MAX_PAYLOAD=100kb # Max request payload size
@@ -34,7 +34,7 @@ JWT_PASSWORD=password # JWT auth password
 JWT_SECRET_KEY=your-secret-key # JWT secret key
 JWT_EXPIRED=24h # JWT token expiration
 
-Voice Integration
+#Voice Integration
 OPENAI_API_KEY=your-openai-key # For Whisper transcription
 ELEVENLABS_XI_API_KEY=your-key # For text-to-speech
 ELEVENLABS_VOICE_ID=voice-id # ElevenLabs voice ID

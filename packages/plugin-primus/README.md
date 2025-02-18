@@ -164,7 +164,7 @@ pnpm add @elizaos/plugin-primus
 
 Add the following environment variables to your .env file:
 
-```
+```env
 PRIMUS_APP_ID=your_app_id
 PRIMUS_APP_SECRET=your_app_secret
 VERIFIABLE_INFERENCE_ENABLED=true

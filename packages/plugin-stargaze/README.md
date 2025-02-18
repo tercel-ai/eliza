@@ -16,9 +16,9 @@ pnpm add @elizaos/plugin-stargaze
 
 Set up your environment with the required Stargaze API endpoint, currently Stargaze offers https://graphql.mainnet.stargaze-apis.com/graphql publicly.
 
-| Variable Name | Description |
-| ------------- | ----------- |
-| `STARGAZE_ENDPOINT` | Stargaze GraphQL API endpoint |
+```env
+STARGAZE_ENDPOINT= Stargaze GraphQL API endpoint
+```
 
 ## Usage
 

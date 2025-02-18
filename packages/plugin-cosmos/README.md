@@ -9,7 +9,7 @@ This plugin provides actions and utilities for interacting with Cosmos-compatibl
 Prepare Eliza according to [README](../../README.md)
 Add variables required for `@elizaos/plugin-cosmos` :
 
-```
+```env
 COSMOS_RECOVERY_PHRASE=your recovery phrase words
 COSMOS_AVAILABLE_CHAINS=chain1,chain2,chain3
 ```

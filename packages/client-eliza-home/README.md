@@ -27,8 +27,8 @@ npm install @elizaos/client-eliza-home
 ## Configuration
 The client requires a SmartThings API token for authentication. Set up your configuration by providing the following environment variables:
 
-```bash
-// Required configuration
+```env
+# Required configuration
 SMARTTHINGS_TOKEN=your_smartthings_api_token
 ```
 

@@ -18,7 +18,7 @@ The `REMOTE_ATTESTATION` action fetches a remote attestation from an attestation
 #### Configuration
 
 The agent fetches the remote attestation from an attestation server whose URL can be configured in the `.env` file:
-```
+```env
 # Optional, default is http://127.0.0.1:1350
 TEE_MARLIN_ATTESTATION_ENDPOINT="http://127.0.0.1:1350"
 ```

@@ -21,9 +21,9 @@ pnpm install @elizaos/plugin-asterai
 
 The plugin requires the following environment variables to be set:
 
-```typescript
-ASTERAI_AGENT_ID=
-ASTERAI_PUBLIC_QUERY_KEY=
+```env
+ASTERAI_AGENT_ID=your_agent_id
+ASTERAI_PUBLIC_QUERY_KEY=your_public_query_key
 ```
 
 ## Usage

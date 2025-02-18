@@ -21,7 +21,7 @@ pnpm install @elizaos/plugin-goat
 
 ### Environment Variables
 
-```typescript
+```env
 EVM_PRIVATE_KEY=<Your EVM wallet private key>
 EVM_PROVIDER_URL=<Your RPC provider URL (e.g., Infura, Alchemy)>
 ```

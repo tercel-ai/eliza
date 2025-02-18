@@ -23,7 +23,7 @@ pnpm install @elizaos/plugin-form
 ## Configuration
 
 ### Environment Variables
-```bash
+```env
 FORM_PRIVATE_KEY=<Your Form chain wallet private key>
 FORM_TESTNET=true  # Optional, defaults to false
 ```

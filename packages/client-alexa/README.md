@@ -20,10 +20,11 @@ npm install @elizaos/client-alexa
 ## Prerequisites
 
 You need to set up the following environment variables:
-
-- `ALEXA_SKILL_ID`: Your Alexa Skill ID
-- `ALEXA_CLIENT_ID`: Your Alexa Client ID
-- `ALEXA_CLIENT_SECRET`: Your Alexa Client Secret
+```env
+ALEXA_SKILL_ID=Your Alexa Skill ID
+ALEXA_CLIENT_ID=Your Alexa Client ID
+ALEXA_CLIENT_SECRET=Your Alexa Client Secret
+```
 
 ## Usage
 

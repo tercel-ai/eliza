@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-fuel
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 FUEL_PRIVATE_KEY=<Private key for the Fuel wallet starting with 0x>
 FUEL_PROVIDER_URL=<Custom RPC endpoint URL (optional, defaults to "https://mainnet.fuel.network/v1/graphql")>
 ```

@@ -21,7 +21,7 @@ npm install @elizaos/client-farcaster
 
 The client requires several environment variables to be set. Key configuration options include:
 
-```base
+```env
 FARCASTER_DRY_RUN=false # Enable/disable dry run mode
 FARCASTER_FID=<your_fid> # Your Farcaster ID
 MAX_CAST_LENGTH=320 # Maximum cast length (default: 320)

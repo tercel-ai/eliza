@@ -19,7 +19,7 @@ npm install @elizaos/plugin-open-weather
 
 2. Set up your environment variables:
 
-```bash
+```env
 OPEN_WEATHER_API_KEY=your_api_key
 ```
 

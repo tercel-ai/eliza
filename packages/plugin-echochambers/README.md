@@ -57,7 +57,7 @@ export const character: Character = {
 
 The plugin requires the following environment variables:
 
-```plaintext
+```env
 # Required Settings
 ECHOCHAMBERS_API_URL="http://127.0.0.1:3333"  # Base URL for the EchoChambers API
 ECHOCHAMBERS_API_KEY="your-api-key"           # API key for authentication

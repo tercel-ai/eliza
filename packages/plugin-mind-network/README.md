@@ -30,7 +30,7 @@ pnpm install @elizaos/plugin-mind-network
 
 Before using the plugin, configure the necessary environment variables:
 
-```bash
+```env
 MIND_HOT_WALLET_PRIVATE_KEY=<Hot wallet private key to vote>
 MIND_COLD_WALLET_ADDRESS=<Cold wallet address to receive rewards>
 ```

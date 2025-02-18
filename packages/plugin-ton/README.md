@@ -46,6 +46,10 @@ The plugin requires the following environment variables:
 TON_PRIVATE_KEY=your_mnemonic_phrase  # Required - wallet mnemonic words
 TON_RPC_URL=your_rpc_endpoint  # Optional - defaults to mainnet RPC
 TON_RPC_API_KEY=
+
+# Optional, for NFT operations
+TON_NFT_IMAGES_FOLDER=
+TON_NFT_METADATA_FOLDER=
 ```
 
 ## Usage

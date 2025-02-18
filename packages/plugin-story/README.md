@@ -19,11 +19,12 @@ npm install @elizaos/plugin-story
 ## Configuration
 
 The plugin requires the following environment variables:
-
-- `STORY_API_BASE_URL` - Story Protocol API base URL
-- `PINATA_JWT` - Pinata JWT for IPFS integration
-- `STORY_API_KEY` - Story Protocol API key
-- `STORY_PRIVATE_KEY` - Story Protocol private key
+```env
+STORY_API_BASE_URL= Story Protocol API base URL
+PINATA_JWT= Pinata JWT for IPFS integration
+STORY_API_KEY= Story Protocol API key
+STORY_PRIVATE_KEY= Story Protocol private key
+```
 
 ## Usage
 

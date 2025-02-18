@@ -29,7 +29,7 @@ Before using this client, you'll need:
 
 The following environment variables are required:
 
-```bash
+```env
 TELEGRAM_ACCOUNT_PHONE="+1234567890"
 TELEGRAM_ACCOUNT_APP_ID=12345
 TELEGRAM_ACCOUNT_APP_HASH="your-app-hash"

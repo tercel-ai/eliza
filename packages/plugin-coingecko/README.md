@@ -18,10 +18,10 @@ pnpm add @elizaos/plugin-coingecko
 
 Set up your environment with the required CoinGecko API key:
 
-| Variable Name       | Description            |
-| ------------------- | ---------------------- |
-| `COINGECKO_API_KEY` | Your CoinGecko Pro API key |
-| `COINGECKO_PRO_API_KEY` | Your CoinGecko Pro API key |
+```env
+COINGECKO_API_KEY=your_api_key
+COINGECKO_PRO_API_KEY=your_pro_api_key
+```
 
 ## Usage
 

@@ -14,7 +14,7 @@ pnpm install @elizaos/plugin-lensNetwork
 ## Configuration
 
 The plugin requires the following environment variables to be set:
-```typescript
+```env
 LENS_ADDRESS=<Your Lens wallet address>
 LENS_PRIVATE_KEY=<Your Lens private key>
 ```

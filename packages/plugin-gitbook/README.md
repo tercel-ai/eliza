@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-gitbook
 
 ### Environment Variables
 
-```typescript
+```env
 GITBOOK_SPACE_ID=<Your GitBook Space ID>
 ```
 

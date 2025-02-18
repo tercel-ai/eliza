@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-flow
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 FLOW_ADDRESS=<Flow wallet address starting with 0x>
 FLOW_PRIVATE_KEY=<Private key for the Flow wallet starting with 0x>
 FLOW_NETWORK=<Network to connect to: "mainnet", "testnet", or "emulator" (optional, defaults to "mainnet")>

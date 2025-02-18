@@ -78,7 +78,7 @@ Terminate the Hyperbolic instance [gpu]puny-clover-basilisk[/gpu]
 
 The plugin requires the following environment variables:
 
-```bash
+```env
 HYPERBOLIC_API_KEY=your_api_key_here
 HYPERBOLIC_ENV=production     # or development
 HYPERBOLIC_GRANULAR_LOG=true  # optional, for detailed logging

@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-aptos
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 APTOS_PRIVATE_KEY=<Your Aptos private key>
 APTOS_NETWORK=<"mainnet" | "testnet">
 ```

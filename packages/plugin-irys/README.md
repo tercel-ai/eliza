@@ -24,9 +24,9 @@ pnpm add @elizaos/plugin-irys
 ## Configuration
 
 The plugin requires the following environment variables:
-
-- `EVM_WALLET_PRIVATE_KEY`: Your EVM wallet private key
-- `AGENTS_WALLET_PUBLIC_KEYS`: The public keys of the agents that will be used to retrieve the data (string separated by commas)
+```env
+EVM_WALLET_PRIVATE_KEY= Your EVM wallet private key
+```
 
 For this plugin to work, you need to have an EVM (Base network) wallet with a private key and public address. To prevent any security issues, we recommend using a dedicated wallet for this plugin.
 

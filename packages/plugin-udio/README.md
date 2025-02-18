@@ -24,8 +24,9 @@ QUICK START
     eliza.registerPlugin(udioPlugin);
 
 2. Configure your Udio authentication token in your environment:
-
-    UDIO_AUTH_TOKEN=your-udio-auth-token
+```env
+UDIO_AUTH_TOKEN=your-udio-auth-token
+```
 
 FEATURES
 

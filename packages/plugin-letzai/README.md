@@ -32,7 +32,7 @@ pnpm install @elizaos/plugin-letzai
 ## Configuration
 
 ### Environment Variables
-```typescript
+```env
 LETZAI_API_LEY=<Your LetzAI API Key>
 LETZAI_MODELS="@hailee, @examplemodel2"
 ```

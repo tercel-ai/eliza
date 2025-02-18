@@ -26,11 +26,11 @@ pnpm install plugin-image-generation
 
 Ensure the following environment variables are set:
 
-| Variable Name          | Description                         |
-| ---------------------- | ----------------------------------- |
-| `IMAGE_STORAGE_BUCKET` | Name of the storage bucket.         |
-| `STORAGE_ACCESS_KEY`   | Access key for storage integration. |
-| `STORAGE_SECRET_KEY`   | Secret key for storage integration. |
+```env
+IMAGE_STORAGE_BUCKET=your_storage_bucket_name
+STORAGE_ACCESS_KEY=your_access_key
+STORAGE_SECRET_KEY=your_secret_key
+```
 
 ### TypeScript Configuration
 

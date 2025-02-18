@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-0g
 
 The plugin requires the following environment variables to be set:
 
-```typescript
+```env
 ZEROG_INDEXER_RPC=<0G indexer RPC endpoint>
 ZEROG_EVM_RPC=<0G EVM RPC endpoint>
 ZEROG_PRIVATE_KEY=<Private key for transactions>

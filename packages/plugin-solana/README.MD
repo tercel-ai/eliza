@@ -62,17 +62,15 @@ npm install @elizaos/plugin-solana
 
 Configure the plugin by setting the following environment variables:
 
-```typescript
-const solanaEnvSchema = {
-    WALLET_SECRET_SALT: string(optional),
-    WALLET_SECRET_KEY: string,
-    WALLET_PUBLIC_KEY: string,
-    SOL_ADDRESS: string,
-    SLIPPAGE: string,
-    SOLANA_RPC_URL: string,
-    HELIUS_API_KEY: string,
-    BIRDEYE_API_KEY: string,
-};
+```env
+WALLET_SECRET_SALT= string(optional),
+WALLET_SECRET_KEY= string,
+WALLET_PUBLIC_KEY= string,
+SOL_ADDRESS= string,
+SLIPPAGE= string,
+SOLANA_RPC_URL= string,
+HELIUS_API_KEY= string,
+BIRDEYE_API_KEY= string,
 ```
 
 ## Usage

@@ -33,7 +33,7 @@ The Starknet plugin serves as a foundational component of Eliza OS, bridging Sta
 
 The plugin requires the following environment variables:
 
-```typescript
+```env
 STARKNET_ADDRESS = your_starknet_address;
 STARKNET_PRIVATE_KEY = your_private_key;
 STARKNET_RPC_URL = your_rpc_url;

@@ -16,7 +16,7 @@ pnpm install @elizaos/plugin-b2
 
 The plugin requires the following environment variable:
 
-```typescript
+```env
 B2_PRIVATE_KEY=<Your B2 private key>
 ```
 

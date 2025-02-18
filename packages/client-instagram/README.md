@@ -24,7 +24,7 @@ pnpm install
 
 The client requires the following environment variables:
 
-```bash
+```env
 # Instagram Credentials
 INSTAGRAM_USERNAME=your_username
 INSTAGRAM_PASSWORD=your_password
