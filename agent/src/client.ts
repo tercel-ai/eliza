@@ -19,16 +19,16 @@ async function getClientInfo(clientDir: string): Promise<ClientInfo | null> {
     elizaLogger.debug(`Reading package.json from: ${packageJsonPath}`);
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
     
-    // try to read README.md or readme.md
+    // try to read README.md with case-insensitive search
     let document;
     try {
-      document = fs.readFileSync(path.join(clientDir, 'README.md'), 'utf-8');
-    } catch {
-      try {
-        document = fs.readFileSync(path.join(clientDir, 'readme.md'), 'utf-8');
-      } catch {
-        // if no readme file, ignore
+      const files = fs.readdirSync(clientDir);
+      const readmeFile = files.find(file => file.toLowerCase() === 'readme.md');
+      if (readmeFile) {
+        document = fs.readFileSync(path.join(clientDir, readmeFile), 'utf-8');
       }
+    } catch (error) {
+      elizaLogger.debug(`No README.md found in ${clientDir}`);
     }
 
     return {

@@ -105,15 +105,14 @@ export async function getPlugins() {
           let document;
           const nodeModulesDir = path.resolve(__dirname, '../node_modules');
           const pluginDir = path.join(nodeModulesDir, packageName);
-          
           try {
-            document = fs.readFileSync(path.join(pluginDir, 'README.md'), 'utf-8');
-          } catch {
-            try {
-              document = fs.readFileSync(path.join(pluginDir, 'readme.md'), 'utf-8');
-            } catch {
-              // if no readme file, ignore
+            const files = fs.readdirSync(pluginDir);
+            const readmeFile = files.find(file => file.toLowerCase() === 'readme.md');
+            if (readmeFile) {
+              document = fs.readFileSync(path.join(pluginDir, readmeFile), 'utf-8');
             }
+          } catch (error) {
+            elizaLogger.debug(`No README.md found in ${pluginDir}`);
           }
 
           return {
