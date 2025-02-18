@@ -2,13 +2,14 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import { elizaLogger } from "@elizaos/core";
-
+import { getAndParseReadme } from "./document";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 interface ClientInfo {
   package: string;
   name: string,
+  env?: Record<string, string|number|boolean>;
   document?: string;
 }
 
@@ -20,20 +21,12 @@ async function getClientInfo(clientDir: string): Promise<ClientInfo | null> {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
     
     // try to read README.md with case-insensitive search
-    let document;
-    try {
-      const files = fs.readdirSync(clientDir);
-      const readmeFile = files.find(file => file.toLowerCase() === 'readme.md');
-      if (readmeFile) {
-        document = fs.readFileSync(path.join(clientDir, readmeFile), 'utf-8');
-      }
-    } catch (error) {
-      elizaLogger.debug(`No README.md found in ${clientDir}`);
-    }
+    const {document, env} = await getAndParseReadme(clientDir);
 
     return {
       package: packageJson.name,
       name: packageJson.name.startsWith('@elizaos/client-') ? packageJson.name.slice(16) : packageJson.name,
+      env,
       document,
     };
   } catch (error) {
@@ -64,23 +57,15 @@ export async function getClients() {
           // Import client module to get client info
           elizaLogger.log(`load client: ${packageName}`);
           // Try to read README.md from node_modules
-          let document;
           const nodeModulesDir = path.resolve(__dirname, '../node_modules');
           const clientDir = path.join(nodeModulesDir, packageName);
           
-          try {
-            document = fs.readFileSync(path.join(clientDir, 'README.md'), 'utf-8');
-          } catch {
-            try {
-              document = fs.readFileSync(path.join(clientDir, 'readme.md'), 'utf-8');
-            } catch {
-              // if no readme file, ignore
-            }
-          }
+          const {document, env} = await getAndParseReadme(clientDir);
 
           return {
             package: packageName,
             name: packageName.startsWith('@elizaos/client-') ? packageName.slice(16) : packageName,
+            env, 
             document,
           };
         } catch (error) {

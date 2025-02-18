@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import { elizaLogger } from "@elizaos/core";
-
+import { getAndParseReadme } from "./document";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -16,6 +16,7 @@ interface PluginInfo {
       [key: string]: any;
     }
   },
+  env?: Record<string, string|number|boolean>;
   document?: string;
 }
 
@@ -27,16 +28,7 @@ async function getPluginInfo(pluginDir: string): Promise<PluginInfo | null> {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
     
     // try to read README.md or readme.md
-    let document;
-    try {
-      document = fs.readFileSync(path.join(pluginDir, 'README.md'), 'utf-8');
-    } catch {
-      try {
-        document = fs.readFileSync(path.join(pluginDir, 'readme.md'), 'utf-8');
-      } catch {
-        // if no readme file, ignore
-      }
-    }
+    const {document, env} = await getAndParseReadme(pluginDir);
 
     // import plugin module to get plugin info
     elizaLogger.log(`Importing plugin module: ${packageJson.name}`);
@@ -58,6 +50,7 @@ async function getPluginInfo(pluginDir: string): Promise<PluginInfo | null> {
       package: packageJson.name,
       name: packageJson.name.startsWith('@elizaos/plugin-') ? packageJson.name.slice(16) : packageJson.name,
       plugin,
+      env,
       document,
     };
   } catch (error) {
@@ -102,23 +95,15 @@ export async function getPlugins() {
           }
 
           // Try to read README.md from node_modules
-          let document;
           const nodeModulesDir = path.resolve(__dirname, '../node_modules');
           const pluginDir = path.join(nodeModulesDir, packageName);
-          try {
-            const files = fs.readdirSync(pluginDir);
-            const readmeFile = files.find(file => file.toLowerCase() === 'readme.md');
-            if (readmeFile) {
-              document = fs.readFileSync(path.join(pluginDir, readmeFile), 'utf-8');
-            }
-          } catch (error) {
-            elizaLogger.debug(`No README.md found in ${pluginDir}`);
-          }
+          const {document, env} = await getAndParseReadme(pluginDir);
 
           return {
             package: packageName,
             name: packageName.startsWith('@elizaos/plugin-') ? packageName.slice(16) : packageName,
             plugin,
+            env,
             document,
           };
         } catch (error) {
