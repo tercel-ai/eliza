@@ -400,6 +400,7 @@ export function createManageApiRouter(
 
     router.get("/logs/stream", (req, res) => {
         const clientId = uuidv4();
+        const now = new Date().getTime();
         
         // Set headers for SSE
         res.writeHead(200, {
@@ -409,12 +410,12 @@ export function createManageApiRouter(
         });
 
         // Send initial connection message
-        res.write('data: {"type":"connected","clientId":"' + clientId + '"}\n\n');
+        res.write(`data: {"level":30,"time":${now},"msg":"${clientId} connected"\n\n`);
 
         // Setup heartbeat
         const heartbeatInterval = setInterval(() => {
             try {
-                res.write('data: {"type":"heartbeat"}\n\n');
+                res.write(`data: {"level":30,"time":${now},"msg":"heartbeat"}\n\n`);
             } catch (err) {
                 cleanup();
             }
