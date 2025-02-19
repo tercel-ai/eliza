@@ -398,5 +398,59 @@ export function createManageApiRouter(
         res.json(providers);
     });
 
+    router.get("/logs/stream", (req, res) => {
+        const clientId = uuidv4();
+        
+        // Set headers for SSE
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+        });
+
+        // Send initial connection message
+        res.write('data: {"type":"connected","clientId":"' + clientId + '"}\n\n');
+
+        // Setup heartbeat
+        const heartbeatInterval = setInterval(() => {
+            try {
+                res.write('data: {"type":"heartbeat"}\n\n');
+            } catch (err) {
+                cleanup();
+            }
+        }, 30000);
+
+        // Subscribe to logs
+        const unsubscribe = elizaLogger.subscribe((logData) => {
+            try {
+                res.write(`data: ${logData}\n\n`);
+            } catch (err) {
+                cleanup();
+            }
+        });
+
+        // Cleanup function
+        const cleanup = () => {
+            clearInterval(heartbeatInterval);
+            unsubscribe();
+        };
+
+        // Handle client disconnect
+        req.on('close', cleanup);
+        req.on('error', cleanup);
+
+        // Set connection timeout
+        const connectionTimeout = setTimeout(() => {
+            res.write('data: {"type":"timeout","message":"Connection timed out after 4 hours"}\n\n');
+            res.end();
+            cleanup();
+        }, 4 * 60 * 60 * 1000); // 4 hours
+
+        // Cleanup timeout on disconnect
+        req.on('close', () => {
+            clearTimeout(connectionTimeout);
+        });
+    });
+
     return router;
 }
