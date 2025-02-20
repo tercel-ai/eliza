@@ -59,7 +59,6 @@ const { heapUsed } = process.memoryUsage();
 let lastHeapUsed = heapUsed;
 
 async function verifyTokenMiddleware(req: any, res: any, next) {
-    console.log("verifyTokenMiddleware", req.url);
     // if JWT is not enabled, skip verification
     if (!(settings.JWT_ENABLED && settings.JWT_ENABLED.toLowerCase() === 'true')) {
         next();
