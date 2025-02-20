@@ -433,7 +433,7 @@ export function createManageApiRouter(
 
     router.get("/logs/stream", (req, res) => {
         const clientId = uuidv4();
-        const now = new Date().getTime();
+        let now = new Date().getTime();
         
         // Set headers for SSE
         res.writeHead(200, {
@@ -448,6 +448,7 @@ export function createManageApiRouter(
         // Setup heartbeat
         const heartbeatInterval = setInterval(() => {
             try {
+                now = new Date().getTime();
                 res.write(`data: {"level":30,"time":${now},"msg":"heartbeat"}\n\n`);
             } catch (err) {
                 cleanup();
@@ -475,6 +476,7 @@ export function createManageApiRouter(
 
         // Set connection timeout
         const connectionTimeout = setTimeout(() => {
+            now = new Date().getTime();
             res.write(`data: {"level":30,"time":${now},"msg":"Connection timed out after 4 hours"}\n\n`);
             res.end();
             cleanup();
