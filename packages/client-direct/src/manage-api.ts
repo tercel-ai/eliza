@@ -49,7 +49,8 @@ type SystemMetrics = {
       usage: {
         user: number; // user time in milliseconds
         system: number; // system time in milliseconds
-        percentage: number; // cpu usage percentage
+        percentage: number; // process cpu usage percentage
+        systemPercentage: number; // system cpu usage percentage
       }
     },
     diskSpace: {
@@ -498,15 +499,36 @@ export function createManageApiRouter(
         // get more detailed CPU info
         const getCPUInfo = async() => {
             const cpus = os.cpus();
-            const startUsage = process.cpuUsage();
-            
-            // wait a short time to calculate CPU usage
-            await new Promise(resolve => setTimeout(resolve, 100));
+            const startUsage = process.cpuUsage(); // get the CPU usage of the process
+            const startTime = process.hrtime.bigint();
+            // wait 1s to calculate CPU usage
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             const endUsage = process.cpuUsage(startUsage);
             const totalTime = endUsage.user + endUsage.system;
-            const percentage = (totalTime / (0.1 * os.cpus().length * 1e6));
+            const endTime = process.hrtime.bigint();
+            const endCpus = os.cpus();
 
+            // calculate actual sampling time (convert to seconds)
+            const elapsedNs = Number(endTime - startTime);
+            const elapsedSeconds = elapsedNs / 1e9;  // convert nanoseconds to seconds
+            const percentage = totalTime / (elapsedSeconds * os.cpus().length * 1e6); // process CPU usage
+
+            // calculate system overall CPU usage
+            let totalSystemUsage = 0;
+            let totalSystemTime = 0;
+            
+            endCpus.forEach((cpu, i) => {
+                const startCpu = cpus[i];
+                const idleDiff = cpu.times.idle - startCpu.times.idle;
+                const totalDiff = Object.values(cpu.times).reduce((a, b) => a + b, 0) - 
+                                Object.values(startCpu.times).reduce((a, b) => a + b, 0);
+                
+                totalSystemUsage += totalDiff - idleDiff;
+                totalSystemTime += totalDiff;
+            });
+    
+            const systemPercentage = totalSystemUsage / totalSystemTime; // system CPU usage
             return {
                 cores: cpus.length,
                 model: cpus[0].model,
@@ -514,7 +536,8 @@ export function createManageApiRouter(
                 loadAvg: os.loadavg(), // 1, 5, 15 minutes average load
                 usage: {
                     ...endUsage,
-                    percentage
+                    percentage,
+                    systemPercentage
                 }
             };
         }
