@@ -505,7 +505,7 @@ export function createManageApiRouter(
             
             const endUsage = process.cpuUsage(startUsage);
             const totalTime = endUsage.user + endUsage.system;
-            const percentage = (totalTime / (0.1 * os.cpus().length * 1e6)) * 100;
+            const percentage = (totalTime / (0.1 * os.cpus().length * 1e6));
 
             return {
                 cores: cpus.length,
