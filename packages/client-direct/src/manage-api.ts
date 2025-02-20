@@ -55,12 +55,8 @@ type SystemMetrics = {
     [key: string]: any;
 }
 
-let lastHeapUsed = 0;
-
-setInterval(() => {
-    const { heapUsed } = process.memoryUsage();
-    lastHeapUsed = heapUsed;
-}, 60000); // check every minute
+const { heapUsed } = process.memoryUsage();
+let lastHeapUsed = heapUsed;
 
 async function verifyTokenMiddleware(req: any, res: any, next) {
     console.log("verifyTokenMiddleware", req.url);
@@ -516,27 +512,25 @@ export function createManageApiRouter(
             };
         }
 
-        const checkMemoryUsage = (usage: any) => {
+        const checkHeapUsageRatio= (usage: any) => {
             
             // calculate heap usage ratio
             const heapUsageRatio = usage.heapUsed / usage.heapTotal;
             
-            // convert to MB for easier reading
-            // const mbUsed = usage.heapUsed / 1024 / 1024;
-            const rssInMB = usage.rss / 1024 / 1024;
-            
             // set warning threshold
-            if (heapUsageRatio > 0.9) {
+            if (heapUsageRatio > 0.95) {
                 elizaLogger.warn(`High heap usage: ${(heapUsageRatio * 100).toFixed(2)}%`);
             }
             
-            if (rssInMB > 2048) { // 2GB
+            // convert to MB for easier reading
+            const rssInMB = usage.rss / 1024 / 1024;
+            // physical memory threshold 
+            const RSS_THRESHOLD_MB = (os.totalmem() / 1024 / 1024) * 0.7;
+            if (rssInMB > RSS_THRESHOLD_MB) {
                 elizaLogger.warn(`High memory usage: ${rssInMB.toFixed(2)}MB`);
             }
             
-            return {
-                heapUsageRatio
-            };
+            return heapUsageRatio;
         }
 
         const memoryHeapIncrease = (usage: any) => {
@@ -555,7 +549,7 @@ export function createManageApiRouter(
             const usage = process.memoryUsage();
             return {
                 ...usage,
-                ...checkMemoryUsage(usage),
+                heapUsageRatio: checkHeapUsageRatio(usage),
                 heapIncrease: memoryHeapIncrease(usage),
                 totalMemory: os.totalmem(),
                 freeMemory: os.freemem(),
