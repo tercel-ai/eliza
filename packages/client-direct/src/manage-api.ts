@@ -53,10 +53,10 @@ type SystemMetrics = {
       }
     },
     diskSpace: {
-        total: number;
-        free: number;
-        used: number;
-        usedPercent: number;
+        total: number; // total disk space in bytes
+        free: number; // free disk space in bytes
+        used: number; // used disk space in bytes
+        usedPercent: number; // used disk space percentage
     }
     [key: string]: any;
 }
