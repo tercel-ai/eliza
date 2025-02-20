@@ -3,6 +3,9 @@
 # switch to project root directory
 cd "$(dirname "$0")/.."
 
+# Default action is restart
+ACTION=${1:-restart}
+
 # load service port configurations from .env file
 if [ -f .env ]; then
     echo "Loading service port configurations from .env file..."
@@ -16,7 +19,6 @@ namePrefix=$(basename $(pwd))
 if [ ! -z "$APP_PREFIX" ]; then
     namePrefix=$APP_PREFIX
 fi
-
 
 cleanup_port() {
     # if get port failed, return directly
@@ -37,19 +39,39 @@ cleanup_port() {
     fi
 }
 
+stop_agent() {
+    echo "Stopping agent..."
+    # Check if the PM2 process exists
+    if pm2 list | grep -q "${namePrefix}-agent"; then
+        pm2 stop "${namePrefix}-agent" | grep "${namePrefix}-agent"
+        sleep 2
+    fi
+    cleanup_port
+}
 
-echo "Stopping agent..."
-# Check if the PM2 process exists
-if pm2 list | grep -q "${namePrefix}-agent"; then
-    pm2 stop "${namePrefix}-agent" | grep "${namePrefix}-agent"
-    sleep 2
-fi
-cleanup_port
+start_agent() {
+    echo "Starting agent..."
+    # If the process doesn't exist, start with ecosystem.config.js
+    if pm2 list | grep -q "${namePrefix}-agent"; then
+        pm2 start "${namePrefix}-agent"
+    else
+        pm2 start ecosystem.config.js
+    fi
+}
 
-echo "Starting agent..."
-# If the process doesn't exist, start with ecosystem.config.js
-if pm2 list | grep -q "${namePrefix}-agent"; then
-    pm2 start "${namePrefix}-agent"
-else
-    pm2 start ecosystem.config.js
-fi
+case "$ACTION" in
+    start)
+        start_agent
+        ;;
+    stop)
+        stop_agent
+        ;;
+    restart)
+        stop_agent
+        start_agent
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
