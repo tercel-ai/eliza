@@ -52,6 +52,12 @@ type SystemMetrics = {
         percentage: number; // cpu usage percentage
       }
     },
+    diskSpace: {
+        total: number;
+        free: number;
+        used: number;
+        usedPercent: number;
+    }
     [key: string]: any;
 }
 
@@ -556,6 +562,31 @@ export function createManageApiRouter(
                 freeMemory: os.freemem(),
             };
         }
+
+        const getDiskSpace = async (path: string = '/'): Promise<{
+            total: number;
+            free: number;
+            used: number;
+            usedPercent: number;
+        }> => {
+            try {
+                const stats = await fs.promises.statfs(path);
+                const total = stats.blocks * stats.bsize;
+                const free = stats.bfree * stats.bsize;
+                const used = total - free;
+                const usedPercent = used / total;
+        
+                return {
+                    total,
+                    free,
+                    used,
+                    usedPercent: Number(usedPercent.toFixed(2))
+                };
+            } catch (error) {
+                elizaLogger.error('Error getting disk space:', error);
+                throw error;
+            }
+        }
         
         try {
             const metrics: SystemMetrics = {
@@ -566,6 +597,7 @@ export function createManageApiRouter(
                 nodeVersion: process.version,
                 memoryUsage: memoryInfo(),
                 cpuUsage: await getCPUInfo(),
+                diskSpace: await getDiskSpace(),
             }
             res.json(metrics);
         } catch (err) {
