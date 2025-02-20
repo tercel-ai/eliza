@@ -4,6 +4,7 @@ import cors from "cors";
 import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+import os from "os";
 
 import {
     type AgentRuntime,
@@ -23,6 +24,43 @@ import type { DirectClient } from ".";
 import { validateUUIDParams } from ".";
 import { md5, signToken, verifyToken } from "./auth";
 
+type SystemMetrics = {
+    pid: number; // process id
+    hostname: string; // hostname
+    uptime: number; // uptime in seconds
+    platform: string; // operating system
+    nodeVersion: string; // node.js version
+    memoryUsage: {
+      rss: number; // resident set size in bytes
+      heapTotal: number; // total heap size in bytes
+      heapUsed: number; // used heap size in bytes
+      external: number; // external memory usage in bytes
+      arrayBuffers: number; // array buffer memory usage in bytes
+      heapUsageRatio: number; // heap usage ratio
+      heapIncrease: number; // heap increase in bytes
+      totalMemory: number; // total memory in bytes
+      freeMemory: number; // free memory in bytes
+    },
+    cpuUsage: {
+      cores: number; // number of cores
+      model: string; // cpu model
+      speed: number; // cpu speed in MHz
+      loadAvg: number[]; // load average in 1, 5, 15 minutes
+      usage: {
+        user: number; // user time in milliseconds
+        system: number; // system time in milliseconds
+        percentage: number; // cpu usage percentage
+      }
+    },
+    [key: string]: any;
+}
+
+let lastHeapUsed = 0;
+
+setInterval(() => {
+    const { heapUsed } = process.memoryUsage();
+    lastHeapUsed = heapUsed;
+}, 60000); // check every minute
 
 async function verifyTokenMiddleware(req: any, res: any, next) {
     console.log("verifyTokenMiddleware", req.url);
@@ -410,7 +448,7 @@ export function createManageApiRouter(
         });
 
         // Send initial connection message
-        res.write(`data: {"level":30,"time":${now},"msg":"${clientId} connected"\n\n`);
+        res.write(`data: {"level":30,"time":${now},"msg":"${clientId} connected"}\n\n`);
 
         // Setup heartbeat
         const heartbeatInterval = setInterval(() => {
@@ -442,7 +480,7 @@ export function createManageApiRouter(
 
         // Set connection timeout
         const connectionTimeout = setTimeout(() => {
-            res.write('data: {"type":"timeout","message":"Connection timed out after 4 hours"}\n\n');
+            res.write(`data: {"level":30,"time":${now},"msg":"Connection timed out after 4 hours"}\n\n`);
             res.end();
             cleanup();
         }, 4 * 60 * 60 * 1000); // 4 hours
@@ -451,6 +489,97 @@ export function createManageApiRouter(
         req.on('close', () => {
             clearTimeout(connectionTimeout);
         });
+    });
+
+    router.get("/system/metrics", async (req, res) => {
+        // get more detailed CPU info
+        const getCPUInfo = async() => {
+            const cpus = os.cpus();
+            const startUsage = process.cpuUsage();
+            
+            // wait a short time to calculate CPU usage
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const endUsage = process.cpuUsage(startUsage);
+            const totalTime = endUsage.user + endUsage.system;
+            const percentage = (totalTime / (0.1 * os.cpus().length * 1e6)) * 100;
+
+            return {
+                cores: cpus.length,
+                model: cpus[0].model,
+                speed: cpus[0].speed, // MHz
+                loadAvg: os.loadavg(), // 1, 5, 15 minutes average load
+                usage: {
+                    ...endUsage,
+                    percentage
+                }
+            };
+        }
+
+        const checkMemoryUsage = (usage: any) => {
+            
+            // calculate heap usage ratio
+            const heapUsageRatio = usage.heapUsed / usage.heapTotal;
+            
+            // convert to MB for easier reading
+            // const mbUsed = usage.heapUsed / 1024 / 1024;
+            const rssInMB = usage.rss / 1024 / 1024;
+            
+            // set warning threshold
+            if (heapUsageRatio > 0.9) {
+                elizaLogger.warn(`High heap usage: ${(heapUsageRatio * 100).toFixed(2)}%`);
+            }
+            
+            if (rssInMB > 2048) { // 2GB
+                elizaLogger.warn(`High memory usage: ${rssInMB.toFixed(2)}MB`);
+            }
+            
+            return {
+                heapUsageRatio
+            };
+        }
+
+        const memoryHeapIncrease = (usage: any) => {
+            // check if heap memory is growing
+            let increase = 0;
+            if(lastHeapUsed > 0) {
+                increase = usage.heapUsed - lastHeapUsed;
+                lastHeapUsed = usage.heapUsed;
+                return increase;
+            }
+            lastHeapUsed = usage.heapUsed;
+            return increase;
+        }
+
+        const memoryInfo = () => { 
+            const usage = process.memoryUsage();
+            return {
+                ...usage,
+                ...checkMemoryUsage(usage),
+                heapIncrease: memoryHeapIncrease(usage),
+                totalMemory: os.totalmem(),
+                freeMemory: os.freemem(),
+            };
+        }
+        
+        try {
+            const metrics: SystemMetrics = {
+                pid: process.pid,
+                hostname: os.hostname(),
+                uptime: process.uptime(),
+                platform: process.platform,
+                nodeVersion: process.version,
+                memoryUsage: memoryInfo(),
+                cpuUsage: await getCPUInfo(),
+            }
+            res.json(metrics);
+        } catch (err) {
+            elizaLogger.error('Error getting system info:', err);
+            res.status(500).json({
+                error: "Failed to get system info",
+                message: err.message
+            });
+        }
     });
 
     return router;
