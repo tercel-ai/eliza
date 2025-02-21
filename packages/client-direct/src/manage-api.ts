@@ -435,7 +435,89 @@ export function createManageApiRouter(
 
     router.get("/providers", async (req, res) => {
         const providers = Object.values(ModelProviderName);
-        res.json(providers);
+        const data = [];
+        const getKeyForProvider = (
+            provider: ModelProviderName,
+        ) => {
+            switch (provider) {
+                // no key needed for llama_local, ollama, lmstudio, gaianet or bedrock
+                case ModelProviderName.LLAMALOCAL:
+                    return {enabled: true, key: ""};
+                case ModelProviderName.OLLAMA:
+                    return {enabled: true, key: ""};
+                case ModelProviderName.LMSTUDIO:
+                    return {enabled: true, key: ""};
+                case ModelProviderName.GAIANET:
+                    return {enabled: true, key: ""};
+                case ModelProviderName.BEDROCK:
+                    return {enabled: true, key: ""};
+                case ModelProviderName.OPENAI:
+                    return {enabled: !!settings.OPENAI_API_KEY, key: "OPENAI_API_KEY"};
+                case ModelProviderName.ETERNALAI:
+                    return {enabled: !!settings.ETERNALAI_API_KEY, key: "ETERNALAI_API_KEY"};
+                case ModelProviderName.NINETEEN_AI:
+                    return {enabled: !!settings.NINETEEN_AI_API_KEY, key: "NINETEEN_AI_API_KEY"};
+                case ModelProviderName.LLAMACLOUD:
+                case ModelProviderName.TOGETHER:
+                    return {enabled: !!settings.LLAMACLOUD_API_KEY || !!settings.TOGETHER_API_KEY || !!settings.OPENAI_API_KEY, key: "LLAMACLOUD_API_KEY||TOGETHER_API_KEY||OPENAI_API_KEY"};
+                case ModelProviderName.CLAUDE_VERTEX:
+                case ModelProviderName.ANTHROPIC:
+                    return {enabled: !!settings.ANTHROPIC_API_KEY, key: "ANTHROPIC_API_KEY"};
+                case ModelProviderName.REDPILL:
+                    return {enabled: !!settings.REDPILL_API_KEY, key: "REDPILL_API_KEY"};
+                case ModelProviderName.OPENROUTER:
+                    return {enabled: !!settings.OPENROUTER_API_KEY, key: "OPENROUTER_API_KEY"};
+                case ModelProviderName.GROK:
+                    return {enabled: !!settings.GROK_API_KEY, key: "GROK_API_KEY"};
+                case ModelProviderName.HEURIST:
+                    return {enabled: !!settings.HEURIST_API_KEY, key: "HEURIST_API_KEY"};
+                case ModelProviderName.GROQ:
+                    return {enabled: !!settings.GROQ_API_KEY, key: "GROQ_API_KEY"};
+                case ModelProviderName.GALADRIEL:
+                    return {enabled: !!settings.GALADRIEL_API_KEY, key: "GALADRIEL_API_KEY"};
+                case ModelProviderName.FAL:
+                    return {enabled: !!settings.FAL_API_KEY, key: "FAL_API_KEY"};
+                case ModelProviderName.ALI_BAILIAN:
+                    return {enabled: !!settings.ALI_BAILIAN_API_KEY, key: "ALI_BAILIAN_API_KEY"};
+                case ModelProviderName.VOLENGINE:
+                    return {enabled: !!settings.VOLENGINE_API_KEY, key: "VOLENGINE_API_KEY"};
+                case ModelProviderName.NANOGPT:
+                    return {enabled: !!settings.NANOGPT_API_KEY, key: "NANOGPT_API_KEY"};
+                case ModelProviderName.HYPERBOLIC:
+                    return {enabled: !!settings.HYPERBOLIC_API_KEY, key: "HYPERBOLIC_API_KEY"};
+                case ModelProviderName.VENICE:
+                    return {enabled: !!settings.VENICE_API_KEY, key: "VENICE_API_KEY"};
+                case ModelProviderName.ATOMA:
+                    return {enabled: !!settings.ATOMASDK_BEARER_AUTH, key: "ATOMASDK_BEARER_AUTH"};
+                case ModelProviderName.NVIDIA:
+                    return {enabled: !!settings.NVIDIA_API_KEY, key: "NVIDIA_API_KEY"};
+                case ModelProviderName.AKASH_CHAT_API:
+                    return {enabled: !!settings.AKASH_CHAT_API_KEY, key: "AKASH_CHAT_API_KEY"};
+                case ModelProviderName.GOOGLE:
+                    return {enabled: !!settings.GOOGLE_GENERATIVE_AI_API_KEY, key: "GOOGLE_GENERATIVE_AI_API_KEY"};
+                case ModelProviderName.MISTRAL:
+                    return {enabled: !!settings.MISTRAL_API_KEY, key: "MISTRAL_API_KEY"};
+                case ModelProviderName.LETZAI:
+                    return {enabled: !!settings.LETZAI_API_KEY, key: "LETZAI_API_KEY"};
+                case ModelProviderName.INFERA:
+                    return {enabled: !!settings.INFERA_API_KEY, key: "INFERA_API_KEY"};
+                case ModelProviderName.DEEPSEEK:
+                    return {enabled: !!settings.DEEPSEEK_API_KEY, key: "DEEPSEEK_API_KEY"};
+                case ModelProviderName.LIVEPEER:
+                    return {enabled: !!settings.LIVEPEER_GATEWAY_URL, key: "LIVEPEER_GATEWAY_URL"};
+                default:
+                    return {enabled: false, key: ""};
+            }
+        }
+        for( const provider of providers) {
+            const key = getKeyForProvider(provider);
+            data.push({
+                provider,
+                ...key
+            });
+        }
+        
+        res.json(data);
     });
 
     router.get("/logs/stream", (req, res) => {
