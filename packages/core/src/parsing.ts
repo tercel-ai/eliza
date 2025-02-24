@@ -219,6 +219,40 @@ export function extractAttributes(
     return Object.entries(attributes).length > 0 ? attributes : null;
 }
 
+export function parseJSONFromText(
+    text: string
+): Record<string, any> | null {
+    const jsonBlockMatch = text.match(jsonBlockPattern);
+
+    if (jsonBlockMatch) {
+        const parsingText = cleanJsonResponse(text);
+        try {
+            return JSON.parse(parsingText);
+        } catch (e) {
+            console.error("Error parsing JSON:", e);
+            console.error("Text is not JSON", text);
+            return extractAttributes(text);
+        }
+    } else {
+        const objectPattern = /{[\s\S]*?}?/;
+        const objectMatch = text.match(objectPattern);
+
+        if (objectMatch) {
+            const parsingText = cleanJsonResponse(text);
+            try {
+                return JSON.parse(parsingText);
+            } catch (e) {
+                console.error("Error parsing JSON:", e);
+                console.error("Text is not JSON", text);
+                return extractAttributes(text);
+            }
+        }
+    }
+    console.error("Text is not JSON", text);
+    return null;
+}
+
+
 /**
  * Normalizes a JSON-like string by correcting formatting issues:
  * - Removes extra spaces after '{' and before '}'.

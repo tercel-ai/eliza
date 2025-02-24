@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
@@ -14,14 +14,25 @@ import {
     type UUID,
     type Character,
     type PaginationParams,
+    type Content,
+    type Memory,
+    type Media,
     AccountStatus,
     stringToUuid,
     settings,
     ModelProviderName,
+    ModelClass,
+    defaultCharacter,
+    composeContext,
+    generateMessageResponse,
+    generateObject,
+    getEmbeddingZeroVector,
+    generateText,
+    parseJSONFromText,
 } from "@elizaos/core";
 
 import type { DirectClient } from ".";
-import { validateUUIDParams } from ".";
+import { validateUUIDParams, messageHandlerTemplate } from ".";
 import { md5, signToken, verifyToken } from "./auth";
 
 type SystemMetrics = {
@@ -713,6 +724,131 @@ export function createManageApiRouter(
             });
         }
     });
+
+
+    router.post(
+        "/tplgen",
+        async (req: express.Request, res: express.Response) => {
+            const { modelProvider, description, secrets } = req.body;
+            if(!modelProvider || !description) {
+                res.status(400).send("Model provider and description are required");
+                return;
+            }
+            const agentId = stringToUuid('template_generator');
+            const roomId = stringToUuid(`default-room-${agentId}`);
+            const userId = stringToUuid('template_generator');
+
+            const runtime = agents.get(agentId);
+
+            if (!runtime) {
+                res.status(404).send("Agent not found");
+                return;
+            }
+
+            // if(runtime.character.modelProvider !== modelProvider) {
+            //     runtime.character.modelProvider = modelProvider;
+            //     runtime.modelProvider = modelProvider;
+            //     if(secrets) {
+            //         Object.assign(runtime.character.settings, secrets);
+            //     }
+            //     elizaLogger.log(`runtime model provider changed to ${modelProvider}`);
+            // }
+
+            await runtime.ensureConnection(
+                userId,
+                roomId,
+                runtime.character.username,
+                runtime.character.name,
+                "direct"
+            );
+
+            const tpl = await directClient.loadCharacterTryPath('characters/lpmanager.character.json');
+            if(!tpl) {
+                res.status(500).send("Failed to load template");
+                return;
+            }
+            
+            tpl.modelProvider = modelProvider;
+            if(secrets) {
+                tpl.settings.secrets = secrets;
+            }
+
+            const text = `According to the user-provided [description] in accordance with the provided json format [template] to generate the user's json content.
+            [description]: ${description}. 
+            [template]: ${JSON.stringify(tpl)}`;
+            
+            const messageId = stringToUuid(Date.now().toString());
+
+            const attachments: Media[] = [];
+
+            const content: Content = {
+                text,
+                attachments,
+                source: "direct",
+                inReplyTo: undefined,
+            };
+
+            const userMessage = {
+                content,
+                userId,
+                roomId,
+                agentId: runtime.agentId,
+            };
+
+            const memory = {
+                id: stringToUuid(`${messageId}-${userId}`),
+                ...userMessage,
+                agentId: runtime.agentId,
+                userId,
+                roomId,
+                content,
+                createdAt: Date.now(),
+            };
+
+            await runtime.messageManager.addEmbeddingToMemory(memory);
+            await runtime.messageManager.createMemory(memory);
+
+            try {
+                elizaLogger.log("Generating message response..");
+    
+                const response = await generateText({
+                    runtime,
+                    context: text,
+                    modelClass: ModelClass.LARGE,
+                });
+                elizaLogger.log("response is:", response);
+                if (!response) {
+                    res.status(500).send(
+                        "No response from generateMessageResponse"
+                    );
+                    return;
+                }
+
+                // try parsing the response as JSON, if null then try again
+                const parsedContent = parseJSONFromText(response);
+                if (!parsedContent) {
+                    elizaLogger.warn("failed to parse response as JSON, response is:", response);
+                    throw new Error("parsedContent is null");
+                }
+                // save response to memory
+                const responseMessage: Memory = {
+                    id: stringToUuid(`${messageId}-${runtime.agentId}`),
+                    ...userMessage,
+                    userId: runtime.agentId,
+                    content: {text: response, source: "direct", attachments: []},
+                    embedding: getEmbeddingZeroVector(),
+                    createdAt: Date.now(),
+                };
+
+                await runtime.messageManager.createMemory(responseMessage);
+
+                res.json(parsedContent);
+            } catch (error) {
+                elizaLogger.error("ERROR:", error);
+                res.status(500).send(`Error generating message response, ${error.message}`);
+            }
+        }
+    );
 
     return router;
 }
