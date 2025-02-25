@@ -731,7 +731,7 @@ export function createManageApiRouter(
         async (req: express.Request, res: express.Response) => {
             const { modelProvider, description, secrets } = req.body;
             if(!modelProvider || !description) {
-                res.status(400).send("Model provider and description are required");
+                res.status(400).send({ error: "Model provider and description are required" });
                 return;
             }
             const agentId = stringToUuid('template_generator');
@@ -741,7 +741,7 @@ export function createManageApiRouter(
             const runtime = agents.get(agentId);
 
             if (!runtime) {
-                res.status(404).send("Agent not found");
+                res.status(404).send({ error: "Agent not found" });
                 return;
             }
 
@@ -764,7 +764,7 @@ export function createManageApiRouter(
 
             const tpl = await directClient.loadCharacterTryPath('characters/lpmanager.character.json');
             if(!tpl) {
-                res.status(500).send("Failed to load template");
+                res.status(500).send({ error: "Failed to load template" });
                 return;
             }
             
@@ -818,9 +818,7 @@ export function createManageApiRouter(
                 });
                 elizaLogger.log("response is:", response);
                 if (!response) {
-                    res.status(500).send(
-                        "No response from generateMessageResponse"
-                    );
+                    res.status(500).send({ error: "No response from generateMessageResponse" });
                     return;
                 }
 
@@ -845,7 +843,7 @@ export function createManageApiRouter(
                 res.json(parsedContent);
             } catch (error) {
                 elizaLogger.error("ERROR:", error);
-                res.status(500).send(`Error generating message response, ${error.message}`);
+                res.status(500).send({ error: `Error generating message response, ${error.message}` });
             }
         }
     );
