@@ -76,6 +76,11 @@ type SystemMetrics = {
 const { heapUsed } = process.memoryUsage();
 let lastHeapUsed = heapUsed;
 
+let oldTplRuntimeData: {
+    modelProvider?: ModelProviderName | null,
+    token?: string | null,
+} = {};
+
 async function verifyTokenMiddleware(req: any, res: any, next) {
     // if JWT is not enabled, skip verification
     if (!(settings.JWT_ENABLED && settings.JWT_ENABLED.toLowerCase() === 'true')) {
@@ -748,6 +753,11 @@ export function createManageApiRouter(
                 return;
             }
 
+            if (!oldTplRuntimeData || Object.keys(oldTplRuntimeData).length === 0) {
+                oldTplRuntimeData.modelProvider = runtime.modelProvider;
+                oldTplRuntimeData.token = runtime.token;
+            }
+
             const tpl = await directClient.loadCharacterTryPath('characters/lpmanager.character.json');
             if(!tpl) {
                 res.status(500).send({ error: "Failed to load template" });
@@ -759,11 +769,13 @@ export function createManageApiRouter(
                 tpl.settings.secrets = secrets;
             }
 
-            if(runtime.character.modelProvider !== modelProvider) {
+            const token = directClient.getTokenForProvider(modelProvider, tpl);
+
+            if(runtime.character.modelProvider !== modelProvider || runtime.token !== token) {
                 runtime.character.modelProvider = modelProvider;
                 runtime.modelProvider = modelProvider;
-                runtime.token = directClient.getTokenForProvider(modelProvider, tpl);
-                elizaLogger.log(`runtime model provider changed to ${modelProvider}`);
+                runtime.token = token;
+                elizaLogger.log(`runtime model provider updated to ${modelProvider}`);
             }
 
             await runtime.ensureConnection(
@@ -774,7 +786,7 @@ export function createManageApiRouter(
                 "direct"
             );
 
-            const text = `According to the user-provided [description] in accordance with the provided json format [template] to generate the user's json content.
+            const text = `According to the user-provided [description] in accordance with the provided json format [template] to generate the user's json content(format should be formatted in a JSON block like template).
             [description]: ${description}. 
             [template]: ${JSON.stringify(tpl)}`;
             
@@ -845,6 +857,10 @@ export function createManageApiRouter(
             } catch (error) {
                 elizaLogger.error("ERROR:", error);
                 res.status(500).send({ error: `Error generating message response, ${error.message}` });
+            } finally {
+                runtime.modelProvider = oldTplRuntimeData.modelProvider;
+                runtime.character.modelProvider = oldTplRuntimeData.modelProvider;
+                runtime.token = oldTplRuntimeData.token;
             }
         }
     );

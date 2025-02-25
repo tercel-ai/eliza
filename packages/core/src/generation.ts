@@ -549,10 +549,6 @@ export async function generateText({
                     fetch: runtime.fetch,
                 });
 
-                elizaLogger.log("OpenAI prompt:", context);
-                elizaLogger.log("OpenAI model:", model);
-                elizaLogger.log("OpenAI system:", runtime.character.system ?? settings.SYSTEM_PROMPT ?? undefined);
-
                 const { text: openaiResponse } = await aiGenerateText({
                     model: openai.languageModel(model),
                     prompt: context,

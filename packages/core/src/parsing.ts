@@ -220,7 +220,8 @@ export function extractAttributes(
 }
 
 export function parseJSONFromText(
-    text: string
+    text: string,
+    strict = true
 ): Record<string, any> | null {
     const jsonBlockMatch = text.match(jsonBlockPattern);
 
@@ -229,6 +230,9 @@ export function parseJSONFromText(
         try {
             return JSON.parse(parsingText);
         } catch (e) {
+            if(strict) {
+                throw e;
+            }
             console.error("Error parsing JSON:", e);
             console.error("Text is not JSON", text);
             return extractAttributes(text);
@@ -242,6 +246,9 @@ export function parseJSONFromText(
             try {
                 return JSON.parse(parsingText);
             } catch (e) {
+                if(strict) {
+                    throw e;
+                }
                 console.error("Error parsing JSON:", e);
                 console.error("Text is not JSON", text);
                 return extractAttributes(text);
@@ -249,6 +256,9 @@ export function parseJSONFromText(
         }
     }
     console.error("Text is not JSON", text);
+    if(strict) {
+        throw new Error("Text is not JSON");
+    }
     return null;
 }
 
