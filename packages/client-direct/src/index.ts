@@ -163,6 +163,7 @@ export class DirectClient {
     public db: TypeDatabaseAdapter;
     public plugins: any[];
     public clients: any[];
+    public getTokenForProvider: Function; // store getTokenForProvider functor
     
     constructor() {
         elizaLogger.log("DirectClient constructor");

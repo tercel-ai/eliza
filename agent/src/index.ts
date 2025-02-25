@@ -1556,6 +1556,7 @@ const startAgents = async () => {
 
     directClient.loadCharacterTryPath = loadCharacterTryPath;
     directClient.jsonToCharacter = jsonToCharacter;
+    directClient.getTokenForProvider = getTokenForProvider;
     directClient.db = db;
     directClient.plugins = await getPlugins();
     directClient.clients = await getClients();

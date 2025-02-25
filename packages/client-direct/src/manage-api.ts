@@ -748,23 +748,6 @@ export function createManageApiRouter(
                 return;
             }
 
-            // if(runtime.character.modelProvider !== modelProvider) {
-            //     runtime.character.modelProvider = modelProvider;
-            //     runtime.modelProvider = modelProvider;
-            //     if(secrets) {
-            //         Object.assign(runtime.character.settings, secrets);
-            //     }
-            //     elizaLogger.log(`runtime model provider changed to ${modelProvider}`);
-            // }
-
-            await runtime.ensureConnection(
-                userId,
-                roomId,
-                runtime.character.username,
-                runtime.character.name,
-                "direct"
-            );
-
             const tpl = await directClient.loadCharacterTryPath('characters/lpmanager.character.json');
             if(!tpl) {
                 res.status(500).send({ error: "Failed to load template" });
@@ -775,6 +758,21 @@ export function createManageApiRouter(
             if(secrets) {
                 tpl.settings.secrets = secrets;
             }
+
+            if(runtime.character.modelProvider !== modelProvider) {
+                runtime.character.modelProvider = modelProvider;
+                runtime.modelProvider = modelProvider;
+                runtime.token = directClient.getTokenForProvider(modelProvider, tpl);
+                elizaLogger.log(`runtime model provider changed to ${modelProvider}`);
+            }
+
+            await runtime.ensureConnection(
+                userId,
+                roomId,
+                runtime.character.username,
+                runtime.character.name,
+                "direct"
+            );
 
             const text = `According to the user-provided [description] in accordance with the provided json format [template] to generate the user's json content.
             [description]: ${description}. 
