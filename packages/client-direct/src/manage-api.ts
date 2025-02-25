@@ -809,7 +809,7 @@ export function createManageApiRouter(
             };
 
             const memory = {
-                id: stringToUuid(`${messageId}-${userId}`),
+                id: stringToUuid(`request-${messageId}-${userId}`),
                 ...userMessage,
                 agentId: runtime.agentId,
                 userId,
@@ -843,10 +843,10 @@ export function createManageApiRouter(
                 }
                 // save response to memory
                 const responseMessage: Memory = {
-                    id: stringToUuid(`${messageId}-${runtime.agentId}`),
+                    id: stringToUuid(`response-${messageId}-${runtime.agentId}`),
                     ...userMessage,
                     userId: runtime.agentId,
-                    content: {text: response, source: "direct", attachments: []},
+                    content: {text: response, user: runtime.character.name, source: "direct", attachments: []},
                     embedding: getEmbeddingZeroVector(),
                     createdAt: Date.now(),
                 };
