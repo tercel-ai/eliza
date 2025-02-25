@@ -1492,7 +1492,7 @@ const startAgents = async () => {
     const directClient = new DirectClient();
     let serverPort = Number.parseInt(settings.SERVER_PORT || "3000");
     const args = parseArguments();
-    const charactersArg = args.characters || args.character;
+    let charactersArg = args.characters || args.character;
     const dataDir = path.join(__dirname, "../data");
 
     if (!fs.existsSync(dataDir)) {
@@ -1510,6 +1510,18 @@ const startAgents = async () => {
     }
 
     const notOnchainJson = !onchainJson || onchainJson == "null";
+
+    //start tplgen agent
+    if(!charactersArg) charactersArg = ''; 
+    if(charactersArg.indexOf('characters/tplgen.character.json') === -1) {
+        if(charactersArg) {
+            charactersArg = ',characters/tplgen.character.json';
+        } else {
+            charactersArg = 'characters/tplgen.character.json';
+        }
+    }
+
+    elizaLogger.log('charactersArg', charactersArg);
 
     if ((notOnchainJson && charactersArg) || hasValidRemoteUrls()) {
         characters = await loadCharacters(charactersArg);

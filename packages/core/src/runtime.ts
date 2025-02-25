@@ -302,6 +302,7 @@ export class AgentRuntime implements IAgentRuntime {
             this.agentId,
             this.character.username || this.character.name,
             this.character.name,
+            this.character?.source || ''
         ).then(() => {
             // postgres needs the user to exist before you can add a participant
             this.ensureParticipantExists(this.agentId, this.agentId);

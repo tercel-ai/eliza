@@ -957,6 +957,8 @@ export type Character = {
     extends?: string[];
 
     twitterSpaces?: TwitterSpaceDecisionOptions;
+    
+    [key: string]: any;
 };
 
 export interface TwitterSpaceDecisionOptions {
