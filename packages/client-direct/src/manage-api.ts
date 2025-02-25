@@ -162,6 +162,9 @@ export function createManageApiRouter(
                     if(!agent && item.status === AccountStatus.ACTIVE) {
                         item.status = AccountStatus.PAUSED;
                         await changeAccountStatus(item.id, AccountStatus.PAUSED);
+                    } else if(agent && item.status !== AccountStatus.ACTIVE) {
+                        item.status = AccountStatus.ACTIVE;
+                        await changeAccountStatus(item.id, AccountStatus.ACTIVE);
                     }
                 }
             }
