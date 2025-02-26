@@ -81,6 +81,16 @@ let oldTplRuntimeData: {
     token?: string | null,
 } = {};
 
+// Add these variables at the top level, near where lastHeapUsed is defined
+let cpuMetrics = {
+    usage: process.cpuUsage(),
+    time: process.hrtime.bigint(),
+    systemCpus: os.cpus(),
+    percentage: 0,
+    systemPercentage: 0,
+    lastUpdate: Date.now()
+};
+
 async function verifyTokenMiddleware(req: any, res: any, next) {
     // if JWT is not enabled, skip verification
     if (!(settings.JWT_ENABLED && settings.JWT_ENABLED.toLowerCase() === 'true')) {
@@ -600,45 +610,64 @@ export function createManageApiRouter(
         // get more detailed CPU info
         const getCPUInfo = async() => {
             const cpus = os.cpus();
-            const startUsage = process.cpuUsage(); // get the CPU usage of the process
-            const startTime = process.hrtime.bigint();
-            // wait 1s to calculate CPU usage
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const currentTime = process.hrtime.bigint();
+            const currentUsage = process.cpuUsage();
+            const now = Date.now();
             
-            const endUsage = process.cpuUsage(startUsage);
-            const totalTime = endUsage.user + endUsage.system;
-            const endTime = process.hrtime.bigint();
-            const endCpus = os.cpus();
-
-            // calculate actual sampling time (convert to seconds)
-            const elapsedNs = Number(endTime - startTime);
-            const elapsedSeconds = elapsedNs / 1e9;  // convert nanoseconds to seconds
-            const percentage = totalTime / (elapsedSeconds * os.cpus().length * 1e6); // process CPU usage
-
-            // calculate system overall CPU usage
-            let totalSystemUsage = 0;
-            let totalSystemTime = 0;
-            
-            endCpus.forEach((cpu, i) => {
-                const startCpu = cpus[i];
-                const idleDiff = cpu.times.idle - startCpu.times.idle;
-                const totalDiff = Object.values(cpu.times).reduce((a, b) => a + b, 0) - 
-                                Object.values(startCpu.times).reduce((a, b) => a + b, 0);
+            // Only recalculate if at least 2 seconds have passed since last update
+            // This prevents excessive calculations on frequent requests
+            if (now - cpuMetrics.lastUpdate >= 2000) {
+                const elapsedNs = Number(currentTime - cpuMetrics.time);
+                const elapsedSeconds = elapsedNs / 1e9;  // convert nanoseconds to seconds
                 
-                totalSystemUsage += totalDiff - idleDiff;
-                totalSystemTime += totalDiff;
-            });
-    
-            const systemPercentage = totalSystemUsage / totalSystemTime; // system CPU usage
+                // Calculate process CPU usage
+                const userDiff = currentUsage.user - cpuMetrics.usage.user;
+                const systemDiff = currentUsage.system - cpuMetrics.usage.system;
+                const totalDiff = userDiff + systemDiff;
+                
+                // Calculate percentage (ensure it's between 0 and 1)
+                const percentage = Math.max(0, Math.min(1, totalDiff / (elapsedSeconds * os.cpus().length * 1e6)));
+                
+                // Calculate system CPU usage
+                let totalSystemUsage = 0;
+                let totalSystemTime = 0;
+                
+                cpus.forEach((cpu, i) => {
+                    const startCpu = cpuMetrics.systemCpus[i];
+                    if (startCpu) {
+                        const idleDiff = cpu.times.idle - startCpu.times.idle;
+                        const totalDiff = Object.values(cpu.times).reduce((a, b) => a + b, 0) - 
+                                        Object.values(startCpu.times).reduce((a, b) => a + b, 0);
+                        
+                        totalSystemUsage += totalDiff - idleDiff;
+                        totalSystemTime += totalDiff;
+                    }
+                });
+                
+                // Calculate system percentage (ensure it's between 0 and 1)
+                const systemPercentage = totalSystemTime > 0 ? 
+                    Math.max(0, Math.min(1, totalSystemUsage / totalSystemTime)) : 0;
+                
+                // Update metrics
+                cpuMetrics = {
+                    usage: currentUsage,
+                    time: currentTime,
+                    systemCpus: cpus,
+                    percentage,
+                    systemPercentage,
+                    lastUpdate: now
+                };
+            }
+            
             return {
                 cores: cpus.length,
                 model: cpus[0].model,
                 speed: cpus[0].speed, // MHz
                 loadAvg: os.loadavg(), // 1, 5, 15 minutes average load
                 usage: {
-                    ...endUsage,
-                    percentage,
-                    systemPercentage
+                    ...currentUsage,
+                    percentage: cpuMetrics.percentage,
+                    systemPercentage: cpuMetrics.systemPercentage
                 }
             };
         }
@@ -664,14 +693,14 @@ export function createManageApiRouter(
             return heapUsageRatio;
         }
 
+        // Fix the memoryHeapIncrease function to avoid NaN
         const memoryHeapIncrease = (usage: any) => {
             // check if heap memory is growing
             let increase = 0;
-            if(lastHeapUsed > 0) {
+            if (lastHeapUsed > 0) {
                 increase = usage.heapUsed - lastHeapUsed;
-                lastHeapUsed = usage.heapUsed;
-                return increase;
             }
+            // Always update lastHeapUsed with the current value
             lastHeapUsed = usage.heapUsed;
             return increase;
         }
