@@ -91,6 +91,20 @@ let cpuMetrics = {
     lastUpdate: Date.now()
 };
 
+const LOG_BUFFER_SIZE = 100; // Keep last 100 log entries
+const logBuffer: string[] = [];
+
+// Add this function to maintain the log buffer
+function addToLogBuffer(logData: string) {
+    logBuffer.push(logData);
+    if (logBuffer.length > LOG_BUFFER_SIZE) {
+        logBuffer.shift(); // Remove oldest entry
+    }
+}
+
+// Subscribe to logs at the application level to maintain the buffer
+elizaLogger.subscribe(addToLogBuffer);
+
 async function verifyTokenMiddleware(req: any, res: any, next) {
     // if JWT is not enabled, skip verification
     if (!(settings.JWT_ENABLED && settings.JWT_ENABLED.toLowerCase() === 'true')) {
@@ -562,6 +576,15 @@ export function createManageApiRouter(
 
         // Send initial connection message
         res.write(`data: {"level":30,"time":${now},"msg":"${clientId} connected"}\n\n`);
+        
+        // Send buffered logs to the new client
+        logBuffer.forEach(logData => {
+            try {
+                res.write(`data: ${logData}\n\n`);
+            } catch (err) {
+                // Ignore errors when sending buffer
+            }
+        });
 
         // Setup heartbeat
         const heartbeatInterval = setInterval(() => {
@@ -573,7 +596,7 @@ export function createManageApiRouter(
             }
         }, 30000);
 
-        // Subscribe to logs
+        // Subscribe to new logs
         const unsubscribe = elizaLogger.subscribe((logData) => {
             try {
                 res.write(`data: ${logData}\n\n`);
@@ -586,6 +609,7 @@ export function createManageApiRouter(
         const cleanup = () => {
             clearInterval(heartbeatInterval);
             unsubscribe();
+            elizaLogger.debug(`Log client ${clientId} disconnected`);
         };
 
         // Handle client disconnect
@@ -604,6 +628,9 @@ export function createManageApiRouter(
         req.on('close', () => {
             clearTimeout(connectionTimeout);
         });
+        
+        // Log that a new client connected
+        elizaLogger.debug(`New log client ${clientId} connected`);
     });
 
     router.get("/system/metrics", async (req, res) => {
