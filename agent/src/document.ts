@@ -32,14 +32,15 @@ export async function getAndParseReadme(dir: string) {
             const [key, ...valueParts] = lineWithoutComment.split('=');
             let value:any = valueParts.join('=').trim(); // handle value with =
             
-            // handle boolean and number
-            if (value.toLowerCase() === "true") {
-                value = true;
-            } else if (value.toLowerCase() === "false") {
-                value = false;
-            } else if (/^\d+$/.test(value)) {
+            // handle number
+            if (/^\d+$/.test(value)) {
                 value = Number.parseInt(value, 10);
             }
+            // else if (value.toLowerCase() === "true") {
+            //     value = true;
+            // } else if (value.toLowerCase() === "false") {
+            //     value = false;
+            // } 
             
             if (key) {
                 env[key.trim()] = value;
