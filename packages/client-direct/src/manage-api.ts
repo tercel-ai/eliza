@@ -29,6 +29,7 @@ import {
     getEmbeddingZeroVector,
     generateText,
     parseJSONFromText,
+    formatCharacterForSave,
 } from "@elizaos/core";
 
 import type { DirectClient } from ".";
@@ -157,6 +158,14 @@ export function createManageApiRouter(
         const account = await directClient.db.getAccountById(accountId);
         if(account) {
             account.status = status;
+            await directClient.db.updateAccount(account);
+        }
+    }
+
+    const updateAccount = async (accountId: UUID, data: Record<string, any>) => {
+        const account = await directClient.db.getAccountById(accountId);
+        if(account) {
+            Object.assign(account, data);
             await directClient.db.updateAccount(account);
         }
     }
@@ -392,7 +401,8 @@ export function createManageApiRouter(
                 throw new Error("No character path or JSON provided");
             }
             await directClient.startAgent(character);
-            await changeAccountStatus(character.id, AccountStatus.ACTIVE);
+            const details = formatCharacterForSave(character);
+            await updateAccount(character.id, {status: AccountStatus.ACTIVE, details});
             elizaLogger.log(`${character.name} started`);
 
             res.json({
