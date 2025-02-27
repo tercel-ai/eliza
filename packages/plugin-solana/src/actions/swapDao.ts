@@ -54,7 +54,7 @@ export const executeSwapForDAO: Action = {
     name: "EXECUTE_SWAP_DAO",
     similes: ["SWAP_TOKENS_DAO", "TOKEN_SWAP_DAO"],
     validate: async (runtime: IAgentRuntime, message: Memory) => {
-        elizaLogger.log("Message:", message);
+        elizaLogger.log("Message:", message?.content?.text);
         return true;
     },
     description: "Perform a DAO token swap using execute_invoke.",

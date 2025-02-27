@@ -28,6 +28,10 @@ interface SolTransferContent extends Content {
 function isSolTransferContent(
     content: any
 ): content is SolTransferContent {
+    const parsedAmount = Number(content.amount);
+    if (!Number.isNaN(parsedAmount)) {
+        content.amount = parsedAmount;
+    }
     return (
         typeof content.recipient === "string" &&
         typeof content.amount === "number"
@@ -40,7 +44,7 @@ Example response:
 \`\`\`json
 {
     "recipient": "9jW8FPr6BSSsemWPV22UUCzSqkVdTp6HTyPqeqyuBbCa",
-    "amount": 1.5
+    "amount": "1.5"
 }
 \`\`\`
 
@@ -85,6 +89,8 @@ export default {
             context: transferContext,
             modelClass: ModelClass.LARGE,
         });
+
+        elizaLogger.log("Content:", content);
 
         if (!isSolTransferContent(content)) {
             if (callback) {

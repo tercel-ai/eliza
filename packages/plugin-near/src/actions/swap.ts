@@ -213,7 +213,7 @@ export const executeSwap: Action = {
         "EXCHANGE_TOKENS_NEAR",
     ],
     validate: async (_runtime: IAgentRuntime, message: Memory) => {
-        elizaLogger.log("Message:", message);
+        elizaLogger.log("Message:", message?.content?.text);
         return true;
     },
     description: "Perform a token swap using Ref Finance.",

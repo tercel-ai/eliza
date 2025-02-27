@@ -61,7 +61,7 @@ export default {
     similes: TRADE_ACTION.similes,
     validate: async (runtime: IAgentRuntime, message: Memory) => {
         // Check if the necessary parameters are provided in the message
-        elizaLogger.log("Message:", message);
+        elizaLogger.log("Message:", message?.content?.text);
         return true;
     },
     description: TRADE_ACTION.description,

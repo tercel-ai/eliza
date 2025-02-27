@@ -175,7 +175,7 @@ export const executeSwap: Action = {
     similes: ["SWAP_TOKENS", "TOKEN_SWAP", "TRADE_TOKENS", "EXCHANGE_TOKENS"],
     validate: async (runtime: IAgentRuntime, message: Memory) => {
         // Check if the necessary parameters are provided in the message
-        elizaLogger.log("Message:", message);
+        elizaLogger.log("Message:", message?.content?.text);
         return true;
     },
     description: "Perform a token swap.",

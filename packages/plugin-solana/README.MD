@@ -63,14 +63,15 @@ npm install @elizaos/plugin-solana
 Configure the plugin by setting the following environment variables:
 
 ```env
-WALLET_SECRET_SALT= string(optional),
-WALLET_SECRET_KEY= string,
+WALLET_SECRET_SALT= string(optional), # only used when TEE_MODE is enabled
+WALLET_SECRET_KEY= string, # only used when TEE_MODE is disabled
 WALLET_PUBLIC_KEY= string,
 SOL_ADDRESS= string,
 SLIPPAGE= string,
 SOLANA_RPC_URL= string,
 HELIUS_API_KEY= string,
 BIRDEYE_API_KEY= string,
+SOLANA_PRIVATE_KEY= string(or WALLET_PRIVATE_KEY), # only used when TEE_MODE is disabled
 ```
 
 ## Usage

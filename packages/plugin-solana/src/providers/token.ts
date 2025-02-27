@@ -100,6 +100,9 @@ export class TokenProvider {
         url: string,
         options: RequestInit = {}
     ): Promise<any> {
+        if(!settings.BIRDEYE_API_KEY) {
+            throw new Error("BIRDEYE_API_KEY is not set");
+        }
         let lastError: Error;
 
         for (let i = 0; i < PROVIDER_CONFIG.MAX_RETRIES; i++) {

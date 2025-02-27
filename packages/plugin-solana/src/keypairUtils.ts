@@ -19,7 +19,7 @@ export async function getWalletKey(
     requirePrivateKey = true
 ): Promise<KeypairResult> {
     const teeMode = runtime.getSetting("TEE_MODE") || TEEMode.OFF;
-
+    elizaLogger.log("getWalletKey TEE mode:", teeMode);
     if (teeMode !== TEEMode.OFF) {
         const walletSecretSalt = runtime.getSetting("WALLET_SECRET_SALT");
         if (!walletSecretSalt) {
@@ -49,7 +49,7 @@ export async function getWalletKey(
         if (!privateKeyString) {
             throw new Error("Private key not found in settings");
         }
-
+        
         try {
             // First try base58
             const secretKey = bs58.decode(privateKeyString);
