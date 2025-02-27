@@ -1009,20 +1009,49 @@ export class AgentRuntime implements IAgentRuntime {
 
             elizaLogger.success(`Normalized action: ${normalizedAction}`);
 
+            // First, try to find an exact match by name
             let action = this.actions.find(
                 (a: { name: string }) =>
                     a.name
                         .toLowerCase()
-                        .replace("_", "")
-                        .includes(normalizedAction) ||
-                    normalizedAction.includes(
-                        a.name.toLowerCase().replace("_", ""),
-                    ),
+                        .replace("_", "") === normalizedAction
             );
 
+            // If no exact match, look for partial matches
+            if (!action) {
+                action = this.actions.find(
+                    (a: { name: string }) =>
+                        a.name
+                            .toLowerCase()
+                            .replace("_", "")
+                            .includes(normalizedAction) ||
+                        normalizedAction.includes(
+                            a.name.toLowerCase().replace("_", ""),
+                        ),
+                );
+            }
+
+            // If still no match, check similes
             if (!action) {
                 elizaLogger.info("Attempting to find action in similes.");
                 for (const _action of this.actions) {
+                    // First try exact simile matches
+                    const exactSimileMatch = _action.similes.find(
+                        (simile) =>
+                            simile
+                                .toLowerCase()
+                                .replace("_", "") === normalizedAction
+                    );
+                    
+                    if (exactSimileMatch) {
+                        action = _action;
+                        elizaLogger.success(
+                            `Action found with exact simile match: ${action.name}`,
+                        );
+                        break;
+                    }
+                    
+                    // Then try partial simile matches
                     const simileAction = _action.similes.find(
                         (simile) =>
                             simile
@@ -1036,7 +1065,7 @@ export class AgentRuntime implements IAgentRuntime {
                     if (simileAction) {
                         action = _action;
                         elizaLogger.success(
-                            `Action found in similes: ${action.name}`,
+                            `Action found with partial simile match: ${action.name}`,
                         );
                         break;
                     }
@@ -1175,7 +1204,7 @@ export class AgentRuntime implements IAgentRuntime {
                 name: name || this.character.name || "Unknown User",
                 username: userName || this.character.username || "Unknown",
                 email: email,
-                details: this.formatCharacterForSave(this.character) || { summary: "" },
+                details: formatCharacterForSave(this.character) || { summary: "" },
                 status: AccountStatus.ACTIVE,
                 pid: this.agentId === userId ? "" : this.agentId,
                 source: source || "",
@@ -1779,18 +1808,6 @@ Text: ${attachment.text}
     setVerifiableInferenceAdapter(adapter: IVerifiableInferenceAdapter): void {
         this.verifiableInferenceAdapter = adapter;
     }
-
-    formatCharacterForSave(character: Character): Character {
-        const data: any = {...character};
-        const plugins: string[] = [];
-        for (const plugin of data.plugins) {
-            if (plugin.package && !plugins.includes(plugin.package)) {
-                plugins.push(plugin.package);
-            }
-        }
-        data.plugins = plugins;
-        return data;
-    }
 }
 
 const formatKnowledge = (knowledge: KnowledgeItem[]) => {
@@ -1807,3 +1824,15 @@ const formatKnowledge = (knowledge: KnowledgeItem[]) => {
         return cleanedText;
     }).join('\n\n'); // Separate distinct pieces with double newlines
 };
+
+export function formatCharacterForSave(character: Character): Character {
+    const data: any = {...character};
+    const plugins: string[] = [];
+    for (const plugin of data.plugins) {
+        if (plugin.package && !plugins.includes(plugin.package)) {
+            plugins.push(plugin.package);
+        }
+    }
+    data.plugins = plugins;
+    return data;
+}
