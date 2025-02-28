@@ -18,7 +18,7 @@ import {
 } from "@elizaos/core";
 import { composeContext } from "@elizaos/core";
 import { getWalletKey } from "../keypairUtils";
-import { generateObjectDeprecated } from "@elizaos/core";
+import { generateObjectDeprecated, cleanEscapedForNumber } from "@elizaos/core";
 
 interface SolTransferContent extends Content {
     recipient: string;
@@ -28,9 +28,12 @@ interface SolTransferContent extends Content {
 function isSolTransferContent(
     content: any
 ): content is SolTransferContent {
-    const parsedAmount = Number(content.amount);
-    if (!Number.isNaN(parsedAmount)) {
-        content.amount = parsedAmount;
+    if (typeof content.amount === "string") {
+        content.amount = cleanEscapedForNumber(content.amount);
+        const parsedAmount = Number(content.amount);
+        if (!Number.isNaN(parsedAmount)) {
+            content.amount = parsedAmount;
+        }
     }
     return (
         typeof content.recipient === "string" &&
@@ -44,7 +47,7 @@ Example response:
 \`\`\`json
 {
     "recipient": "9jW8FPr6BSSsemWPV22UUCzSqkVdTp6HTyPqeqyuBbCa",
-    "amount": "1.5"
+    "amount": 1.5
 }
 \`\`\`
 
@@ -52,7 +55,7 @@ Example response:
 
 Extract the following information about the requested SOL transfer:
 - Recipient wallet address
-- Amount of SOL to transfer
+- Amount of SOL to transfer (as a number)
 `;
 
 export default {

@@ -388,3 +388,23 @@ export function truncateToCompleteSentence(
     const hardTruncated = text.slice(0, maxLength - 3).trim();
     return hardTruncated + "...";
 }
+
+/**
+ * Cleans common escape characters from a string
+ * @param value The string or number to clean
+ * @returns The cleaned string
+ */
+export function cleanEscapedForNumber(value: string | number): string {
+    if (typeof value === 'number') {
+        return value.toString();
+    }
+    
+    return value
+        .replace(/\\./g, '.') // Handle escaped periods
+        .replace(/\\\\/g, '\\') // Handle escaped backslashes
+        .replace(/\\n/g, '\n') // Handle escaped newlines
+        .replace(/\\r/g, '\r') // Handle escaped carriage returns
+        .replace(/\\t/g, '\t') // Handle escaped tabs
+        .replace(/\\"/g, '"') // Handle escaped double quotes
+        .replace(/\\'/g, "'"); // Handle escaped single quotes
+}

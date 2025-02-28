@@ -239,14 +239,13 @@ async function handler(runtime: IAgentRuntime, message: Memory) {
         // - from here we just need to make sure code is right
 
         // buy, dont buy, sell, dont sell
-
-        const buyAmounts = await tokenProvider.calculateBuyAmounts();
-
-        let buyAmount = buyAmounts[rec.conviction.toLowerCase().trim()];
-        if (!buyAmount) {
-            // handle annoying cases
-            // for now just put in 10 sol
-            buyAmount = 10;
+        let buyAmount = 0;
+        try {
+            const buyAmounts = await tokenProvider.calculateBuyAmounts();
+            buyAmount = buyAmounts[rec.conviction.toLowerCase().trim()];
+        } catch (error) {
+            elizaLogger.warn("Error calculating buy amounts", error);
+            continue;
         }
 
         // TODO: is this is a buy, sell, dont buy, or dont sell?
@@ -267,7 +266,7 @@ async function handler(runtime: IAgentRuntime, message: Memory) {
                     rec.contractAddress,
                     userId,
                     {
-                        buy_amount: rec.buyAmount,
+                        buy_amount: buyAmount,
                         is_simulation: true,
                     }
                 );

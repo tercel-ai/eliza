@@ -413,6 +413,7 @@ export class AgentRuntime implements IAgentRuntime {
         ];
 
         this.plugins.forEach((plugin) => {
+            elizaLogger.log("agent runtime plugin:", plugin.name, plugin.package);
             plugin.actions?.forEach((action) => {
                 this.registerAction(action);
             });

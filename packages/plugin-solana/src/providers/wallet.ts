@@ -350,7 +350,7 @@ export class WalletProvider {
             this.cache.set(cacheKey, prices);
             return prices;
         } catch (error) {
-            elizaLogger.error("Error fetching prices:", error);
+            elizaLogger.error("Error fetching prices:", error.message);
             throw error;
         }
     }
