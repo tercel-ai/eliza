@@ -63,7 +63,7 @@ export default {
     similes: ["TRANSFER_SOL", "PAY_SOL", "TRANSACT_SOL"],
     validate: async (runtime: IAgentRuntime, message: Memory) => {
         // Always return true for SOL transfers, letting the handler deal with specifics
-        elizaLogger.log("Validating SOL transfer from user:", message.userId);
+        elizaLogger.log("Validating SOL transfer from user:", message.userId, message.content);
         return true;
     },
     description: "Transfer native SOL from agent's wallet to specified address",
@@ -86,14 +86,14 @@ export default {
             state,
             template: solTransferTemplate,
         });
-
+        elizaLogger.debug("Transfer request context:", transferContext);
         const content = await generateObjectDeprecated({
             runtime,
             context: transferContext,
             modelClass: ModelClass.LARGE,
         });
 
-        elizaLogger.log("Content:", content);
+        // elizaLogger.debug("Received content:", content);
 
         if (!isSolTransferContent(content)) {
             if (callback) {

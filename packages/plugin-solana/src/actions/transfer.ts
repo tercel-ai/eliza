@@ -68,7 +68,7 @@ export default {
     similes: ["TRANSFER_TOKEN", "TRANSFER_TOKENS", "SEND_TOKENS", "PAY_TOKEN", "PAY_TOKENS", "PAY"],
     validate: async (runtime: IAgentRuntime, message: Memory) => {
         // Always return true for token transfers, letting the handler deal with specifics
-        elizaLogger.log("Validating token transfer from user:", message.userId);
+        elizaLogger.log("Validating token transfer from user:", message.userId, message.content);
         return true;
     },
     description: "Transfer SPL tokens from agent's wallet to another address",

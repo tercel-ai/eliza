@@ -373,12 +373,14 @@ export class DirectClient {
                     template: messageHandlerTemplate,
                 });
 
+                elizaLogger.debug("direct client request:", context);
+
                 const response = await generateMessageResponse({
                     runtime: runtime,
                     context,
                     modelClass: ModelClass.LARGE,
                 });
-
+                elizaLogger.debug("direct client response:", response);
                 if (!response) {
                     res.status(500).send(
                         "No response from generateMessageResponse"
