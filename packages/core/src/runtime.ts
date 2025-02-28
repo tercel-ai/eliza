@@ -287,9 +287,23 @@ export class AgentRuntime implements IAgentRuntime {
             `[AgentRuntime] Process knowledgeRoot: ${this.knowledgeRoot}`,
         );
 
-        this.#conversationLength =
-            opts.conversationLength ?? this.#conversationLength;
-
+        this.#conversationLength = (() => {
+            // Get the value from options, character settings, or default
+            let length = opts.conversationLength ?? this.character.conversationLength ?? this.#conversationLength;
+            
+            // Ensure minimum value of 2
+            length = Math.max(2, length);
+            
+            // Make sure it's an even number (multiple of 2)
+            if (length % 2 !== 0) {
+                length += 1;
+            }
+            
+            return length;
+        })();
+        
+        elizaLogger.log(`[AgentRuntime] Conversation length: ${this.#conversationLength}`);
+        
         if (!opts.databaseAdapter) {
             throw new Error("No database adapter provided");
         }
@@ -967,6 +981,14 @@ export class AgentRuntime implements IAgentRuntime {
      * @param action The action to register.
      */
     registerAction(action: Action) {
+        if (this.character.disabledActions?.includes(action.name)) {
+            elizaLogger.log(`${this.character.name}(${this.agentId}) - Action ${action.name} is disabled.`);
+            return;
+        }
+        if (Array.isArray(this.character.enabledActions) && this.character.enabledActions?.length > 0 && !this.character.enabledActions.includes(action.name)) {
+            elizaLogger.log(`${this.character.name}(${this.agentId}) - Action ${action.name} is not enabled.`);
+            return;
+        }
         elizaLogger.success(`${this.character.name}(${this.agentId}) - Registering action: ${action.name}`);
         this.actions.push(action);
     }

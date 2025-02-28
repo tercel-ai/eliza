@@ -957,6 +957,15 @@ export type Character = {
     extends?: string[];
 
     twitterSpaces?: TwitterSpaceDecisionOptions;
+
+    /** Optional number of messages to keep in the conversation history. */
+    conversationLength?: number;
+    
+    /** Optional list of actions to enable. */
+    enabledActions?: string[];
+
+    /** Optional list of actions to disable. */
+    disabledActions?: string[];
     
     [key: string]: any;
 };

@@ -152,6 +152,9 @@ export const CharacterSchema = z.object({
         })
         .optional(),
     extends: z.array(z.string()).optional(),
+    conversationLength: z.number().optional(),
+    enabledActions: z.array(z.string()).optional(),
+    disabledActions: z.array(z.string()).optional(),
 });
 
 // Type inference
