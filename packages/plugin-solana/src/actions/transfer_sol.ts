@@ -93,7 +93,7 @@ export default {
             modelClass: ModelClass.LARGE,
         });
 
-        // elizaLogger.debug("Received content:", content);
+        elizaLogger.debug("Received content:", content);
 
         if (!isSolTransferContent(content)) {
             if (callback) {

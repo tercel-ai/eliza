@@ -283,7 +283,7 @@ export async function loadCharacterFromOnchain(): Promise<Character[]> {
 
         // Handle plugins
         if (isAllStrings(character.plugins)) {
-            elizaLogger.info("Plugins are: ", character.plugins);
+            elizaLogger.info("loading plugins: ", character.plugins);
             const importedPlugins = await Promise.all(
                 character.plugins.map(async (plugin) => {
                     const importedPlugin = await import(plugin);
@@ -503,7 +503,7 @@ async function handlePluginImporting(plugins: string[] | any[]) {
         return [];
     }
 
-    elizaLogger.info("Plugins are: ", plugins);
+    elizaLogger.debug("handling plugins: ", plugins);
     const importedPlugins = await Promise.all(
         plugins.map(async (plugin) => {
             // if plugin is already an object, return it

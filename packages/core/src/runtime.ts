@@ -998,6 +998,15 @@ export class AgentRuntime implements IAgentRuntime {
      * @param evaluator The evaluator to register.
      */
     registerEvaluator(evaluator: Evaluator) {
+        if (this.character.disabledEvaluators?.includes(evaluator.name)) {
+            elizaLogger.log(`${this.character.name}(${this.agentId}) - Evaluator ${evaluator.name} is disabled.`);
+            return;
+        }
+        if (Array.isArray(this.character.enabledEvaluators) && this.character.enabledEvaluators?.length > 0 && !this.character.enabledEvaluators.includes(evaluator.name)) {
+            elizaLogger.log(`${this.character.name}(${this.agentId}) - Evaluator ${evaluator.name} is not enabled.`);
+            return;
+        }
+        elizaLogger.success(`${this.character.name}(${this.agentId}) - Registering evaluator: ${evaluator.name}`);
         this.evaluators.push(evaluator);
     }
 

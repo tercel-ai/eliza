@@ -966,6 +966,12 @@ export type Character = {
 
     /** Optional list of actions to disable. */
     disabledActions?: string[];
+
+    /** Optional list of evaluators to enable. */
+    enabledEvaluators?: string[];
+
+    /** Optional list of evaluators to disable. */
+    disabledEvaluators?: string[];
     
     [key: string]: any;
 };
