@@ -274,7 +274,7 @@ export function createManageApiRouter(
             }
             
         } catch (e) {
-            elizaLogger.error(`Error parsing character: ${e}`);
+            elizaLogger.error("Error parsing character:", e);
             res.status(400).json({
                 error: e.message,
             });
@@ -324,7 +324,7 @@ export function createManageApiRouter(
         try {
             validateCharacterConfig(character);
         } catch (e) {
-            elizaLogger.error(`Error parsing character: ${e}`);
+            elizaLogger.error("Error parsing character:", e);
             res.status(400).json({
                 success: false,
                 message: e.message,
@@ -410,7 +410,7 @@ export function createManageApiRouter(
                 character: character,
             });
         } catch (e) {
-            elizaLogger.error(`Error parsing character: ${e}`);
+            elizaLogger.error("Error parsing character:", e);
             res.status(400).json({
                 error: e.message,
             });
