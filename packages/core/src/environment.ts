@@ -142,7 +142,7 @@ export const CharacterSchema = z.object({
         .object({
             username: z.string(),
             screenName: z.string(),
-            bio: z.string(),
+            bio: z.union([z.string(), z.array(z.string())]),
             nicknames: z.array(z.string()).optional(),
         })
         .optional(),
