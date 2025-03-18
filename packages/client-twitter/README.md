@@ -33,7 +33,7 @@ TWITTER_2FA_SECRET=<string; // Optional: 2FA secret if enabled>
 TWITTER_ENABLED=<boolean; // Optional: Enable Twitter client (default: true)>
 TWITTER_DRY_RUN=<boolean; // Optional: Run without posting (default: false)>
 MAX_TWEET_LENGTH=<number; // Optional: Max tweet length (default: 280)>
-TWITTER_SEARCH_ENABLE=<boolean; // Optional: Enable search features>
+TWITTER_SEARCH_ENABLE=<boolean; // Optional: Enable a search feature using topic words>
 TWITTER_TARGET_USERS=<string[]; // Optional: Users to monitor>
 POST_INTERVAL_MIN=<number; // Optional: Min posting interval (mins)>
 POST_INTERVAL_MAX=<number; // Optional: Max posting interval (mins)>
@@ -46,12 +46,12 @@ ACTION_INTERVAL=<number; // Optional: Action interval (minutes)>
 POST_IMMEDIATELY=<boolean; // Optional: Post immediately>
 TWITTER_SPACES_ENABLE=<boolean; // Optional: Enable Spaces features>
 MAX_ACTIONS_PROCESSING=<number; // Optional: Max actions to process>
-ACTION_TIMELINE_TYPE=<string; // Optional: Action timeline type>
+ACTION_TIMELINE_TYPE=<string; // Optional: Action timeline type, (value: foryou|following)>
 TWITTER_APPROVAL_ENABLED=<boolean; // Optional: Enable approval workflow>
 TWITTER_APPROVAL_DISCORD_BOT_TOKEN=<string; // Optional: Discord bot token>
 TWITTER_APPROVAL_DISCORD_CHANNEL_ID=<string; // Optional: Discord channel ID>
 TWITTER_APPROVAL_CHECK_INTERVAL=<number; // Optional: Approval check interval >
-ELEVENLABS_XI_API_KEY=<string; // Optional: ElevenLabs API key>
+ELEVENLABS_XI_API_KEY=<string; // Optional: ElevenLabs API key for spaces vioce>
 ```
 
 ## Usage
