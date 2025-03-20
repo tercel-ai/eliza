@@ -132,6 +132,7 @@ export async function startAgent(
       logger.debug(`Successfully loaded plugin ${plugin}`);
     } catch (error) {
       logger.info(`Plugin ${plugin} not installed, installing into ${process.cwd()}...`);
+      logger.error(`Fail to load plugin ${plugin}:`, error);
       await installPlugin(plugin, process.cwd(), version);
 
       try {
@@ -257,7 +258,11 @@ async function stopAgent(runtime: IAgentRuntime, server: AgentServer) {
  * @param {Object} options - Command options
  * @returns {Promise<void>} A promise that resolves when the agents are successfully started.
  */
-const startAgents = async (options: { configure?: boolean; port?: number; character?: string }) => {
+const startAgents = async (options: {
+  configure?: boolean;
+  port?: number;
+  character?: Character;
+}) => {
   // Set up standard paths and load .env
   const homeDir = os.homedir();
   const elizaDir = path.join(homeDir, '.eliza');
@@ -462,8 +467,6 @@ const startAgents = async (options: { configure?: boolean; port?: number; charac
 
   server.start(serverPort);
 
-  console.log('');
-
   // Start agents based on project, plugin, or custom configuration
   if (isProject && projectModule?.default) {
     // Load all project agents, call their init and register their plugins
@@ -475,6 +478,14 @@ const startAgents = async (options: { configure?: boolean; port?: number; charac
       : project.agent
         ? [project.agent]
         : [];
+
+    if (options.character) {
+      agents.push({
+        character: options.character,
+        init: async (runtime: IAgentRuntime) => {},
+        plugins: [],
+      });
+    }
 
     if (agents.length > 0) {
       logger.debug(`Found ${agents.length} agents in project`);
@@ -506,13 +517,13 @@ const startAgents = async (options: { configure?: boolean; port?: number; charac
 
       if (startedAgents.length === 0) {
         logger.warn('Failed to start any agents from project, falling back to custom character');
-        await startAgent(defaultCharacter, server);
+        await startAgent(options.character || defaultCharacter, server);
       } else {
         logger.debug(`Successfully started ${startedAgents.length} agents from project`);
       }
     } else {
       logger.debug('Project found but no agents defined, falling back to custom character');
-      await startAgent(defaultCharacter, server);
+      await startAgent(options.character || defaultCharacter, server);
     }
   } else if (isPlugin && pluginModule) {
     // Before starting with the plugin, prompt for any environment variables it needs
@@ -543,7 +554,7 @@ const startAgents = async (options: { configure?: boolean; port?: number; charac
 
     // Start the agent with the default character and our test plugin
     // We're in plugin test mode, so we should skip auto-loading embedding models
-    await startAgent(defaultElizaCharacter, server, undefined, pluginsToLoad, {
+    await startAgent(options.character || defaultElizaCharacter, server, undefined, pluginsToLoad, {
       isPluginTestMode: true,
     });
     logger.info('Character started with plugin successfully');
@@ -551,7 +562,7 @@ const startAgents = async (options: { configure?: boolean; port?: number; charac
     // When not in a project or plugin, load the default character with all plugins
     const { character: defaultElizaCharacter } = await import('../characters/eliza');
     logger.info('Using default Eliza character with all plugins');
-    await startAgent(defaultElizaCharacter, server);
+    await startAgent(options.character || defaultElizaCharacter, server);
   }
 
   // Display link to the client UI
@@ -586,7 +597,7 @@ export const start = new Command()
       if (characterPath) {
         logger.info(`Loading character from ${characterPath}`);
         try {
-          const characterData = await loadCharacterTryPath(characterPath);
+          options.character = await loadCharacterTryPath(characterPath);
           await startAgents(options);
         } catch (error) {
           logger.error(`Failed to load character: ${error}`);
