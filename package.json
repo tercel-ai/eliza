@@ -3,7 +3,6 @@
   "scripts": {
     "preinstall": "only-allow bun",
     "start": "cd ./packages/the-org && bun run start",
-    "start:myeliza": "cd ./packages/myeliza && bun run start",
     "start:debug": "cross-env NODE_NO_WARNINGS=1 LOG_LEVEL=debug elizaos start",
     "start:app": "turbo run start --filter=./packages/app",
     "dev": "turbo run dev --filter=./packages/the-org",
